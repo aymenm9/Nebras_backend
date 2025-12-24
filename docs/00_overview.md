@@ -1,0 +1,385 @@
+# 1. Project Overview (Broad Idea)
+
+Cloud-based digital archiving and content management system.
+
+Purpose:
+- Store and serve large media (books, audio, very long videos)
+- Organize content hierarchically
+- Enforce role-based access
+- Stream content securely without backend handling files
+
+Core principle:
+**Backend owns metadata and permissions. Object storage (Cloudflare R2) owns files.**
+
+---
+
+# 2. Actors & Permissions (System Truth)
+
+## Roles
+
+### User
+- Read-only
+- Browse categories
+- Stream content
+
+### Moderator
+- All User permissions
+- Upload single content
+- Edit/delete content metadata
+
+### Super Admin
+- All Moderator permissions
+- Manage moderators
+- Manage categories
+- System-level settings
+
+Enforcement:
+- UI hides features
+- Backend strictly enforces roles
+
+---
+
+# 3. High-Level Architecture (Top Down)
+
+```
+Android App (Users)
+  ├─ Browse & Stream
+  ├─ Hidden Stats Dashboard
+  │
+  ▼
+Android App (Admins / Moderators)
+  ├─ Content Management
+  ├─ Internal Chat (REST in MVP)
+  │
+  ▼
+Backend API (Django + DRF)
+  ├─ Auth & RBAC (Email + Password)
+  ├─ Category hierarchy validation
+  ├─ Content metadata
+  ├─ Upload orchestration (Hybrid: Direct & Signed URLs)
+  ├─ Signed URL generation (Large files)
+  ├─ Admin messaging (Polling/Refresh)
+  │
+  ▼
+Database (PostgreSQL)
+  │
+  ▼
+Object Storage (Cloudflare R2)
+  │
+  ▼
+CDN / Streaming (Cloudflare)
+```
+
+Backend is stateless and never handles media bytes.
+
+
+---
+
+# 4. Backend Responsibilities (Exact Scope)
+
+Backend DOES:
+- Authenticate users (JWT)
+- Enforce roles
+- Manage category tree
+- Store content metadata
+- Generate signed upload URLs
+- Generate signed streaming URLs
+
+Backend DOES NOT:
+- Store files
+- Stream media
+- Transcode
+- Process media
+
+---
+
+# 5. Data Model (Backend-Centric)
+
+## 5.1 User & Authentication
+
+**Model**: Standard Django `User` + `OneToOne` Profile.
+
+### Authentication
+- **Login**: Email + Password.
+
+### Profile Model (1-to-1)
+```
+Profile
+- user_id (FK to auth_user)
+- profile_image (Small file -> Direct Upload to R2)
+- is_banned (boolean, default=False)
+- ban_expires_at (datetime, nullable)
+```
+
+### Role Logic
+- **Moderator**: Group Chat (Polling/Refresh), generic permissions.
+- **Super Admin**: Can ban mods.
+    - **Ban Logic**: Can be permanent (`is_active=False`) or temporary (e.g., 15 days) using `ban_expires_at`.
+
+Notes:
+- Profile image is uploaded directly to R2 via Django backend (Small file flow).
+
+---
+
+## 5.2 Category Structure (Fixed Hierarchy)
+
+Not fully recursive. Fixed to **three semantic levels**.
+
+### Levels
+- **Main Section** (Root)
+- **Sub Section** (Child of Main)
+- **Secondary Sub Section** (Optional Child of Sub)
+
+Rules:
+- **Main Sections** contain ONLY Sub Sections.
+- **Sub Sections** can have EITHER:
+  1. Files directly.
+  2. Secondary Sub Sections (which then contain files).
+- **Secondary Sub Sections** contain ONLY files.
+
+### Data Model
+
+```
+Category
+- id
+- name
+- level (MAIN | SUB | SUB_SUB)
+- parent_id (nullable)
+- order_index
+- created_by
+```
+
+Validation rules enforced in backend, not UI.
+
+
+---
+
+## 5.3 Content (Metadata Only)
+
+```
+Content
+- id
+- type (BOOK | AUDIO | VIDEO)
+- category_id
+- title
+- description
+- duration_seconds (nullable)
+- storage_key
+- file_size
+- mime_type
+- status (UPLOADING | READY)
+- created_by
+- created_at
+```
+
+No binary data in DB.
+
+---
+
+# 6. Storage & Security Model
+
+## 6.1 Object Storage (Cloudflare R2)
+
+- **Provider**: Cloudflare R2 (S3-compatible).
+- **Buckets**: Private.
+
+### Storage Strategy (Hybrid)
+1. **Small Files (e.g., Profile Pictures)**:
+   - **Mechanism**: Direct upload through Django.
+   - **Storage**: `django-storages` pointing to R2.
+   - No frontend signing needed.
+
+2. **Large Files (Media > 10MB)**:
+   - **Mechanism**: Signed URLs (Presigned PUT/POST).
+   - **Flow**: Frontend requests URL -> Backend authorizes & signs -> Frontend uploads to R2.
+
+Structure:
+```
+books/{content_id}.pdf
+audio/{content_id}.mp3
+video/{content_id}.mp4
+```
+
+Files are immutable.
+
+---
+
+## 6.2 Access Control
+
+- Only backend (or signed URLs) can write to R2.
+- Clients access media only via signed URLs.
+
+Security is policy-based (IAM), not code-based.
+
+---
+
+# 7. Upload Flow (Core Backend Logic)
+
+## 7.1 Upload Initialization
+
+Client → Backend:
+```
+POST /uploads/init
+- file_name
+- file_size
+- mime_type
+- content_type
+- category_id
+```
+
+Backend:
+- Auth + role check
+- Create Content row (status = UPLOADING)
+- Decide storage_key
+- Generate signed PUT URL
+
+Backend → Client:
+```
+{ upload_url, content_id }
+```
+
+---
+
+## 7.2 Direct Upload
+
+Client → S3:
+```
+PUT signed_upload_url
+(binary file)
+```
+
+Properties:
+- URL bound to single object
+- Method restricted (PUT)
+- Short TTL
+
+---
+
+## 7.3 Upload Completion
+
+Client → Backend:
+```
+POST /uploads/complete
+{ content_id }
+```
+
+Backend:
+- Optional HEAD object check
+- Mark content as READY
+
+---
+
+# 8. Streaming / Download Flow
+
+Client → Backend:
+```
+GET /stream/{content_id}
+```
+
+Backend:
+- Auth check
+- Permission check
+- Generate signed GET URL (short TTL)
+
+Client:
+- Streams directly from S3/CDN
+
+Backend never streams media.
+
+---
+
+# 9. Signed URL Properties (Critical Understanding)
+
+Signed URLs:
+- Cryptographically signed
+- Time-limited
+- Bound to object + method
+
+They:
+- Can be copied
+- Expire automatically
+- Cannot be reused after expiry
+
+This is standard AWS behavior.
+
+---
+
+# 10. Threat Model (What Is / Is Not Protected)
+
+## Protected Against
+- Unauthorized access
+- URL guessing
+- Hotlinking
+- Backend overload
+- Storage abuse
+
+## Not Protected Against (By Design)
+- Screen recording
+- Download during valid window
+- Malicious authorized users
+
+Solving those requires DRM (out of MVP scope).
+
+---
+
+# 11. MVP vs Full System (Backend Perspective)
+
+## MVP
+- Signed URLs
+- Private buckets
+- Role-based API
+- In-app admin panel
+- Admin/moderator messaging via REST (Polling/Refresh on client).
+- No websockets (Feature deferred).
+- No transcoding
+- No analytics
+
+## Full System (Later)
+- Web admin dashboard
+- Admin chat via WebSockets
+- HLS streaming
+- Bulk upload UI
+- Rate limiting
+- Audit logs
+- Analytics
+- DRM (optional, expensive)
+
+Core architecture does not change.
+
+
+---
+
+# 12. Storage Usage & Deployment
+
+## Provider
+- **Cloudflare R2**
+
+## Authentication
+- Access Key ID / Secret Access Key via Environment Variables (Django settings).
+
+## Environments
+- Dev Bucket
+- Prod Bucket
+
+---
+
+# 13. Backend Tech Stack
+
+- Django
+- Django REST Framework
+- PostgreSQL
+- boto3 (AWS SDK)
+- JWT auth
+
+Django logic = CRUD + orchestration.
+
+---
+
+# 14. Final Mental Model
+
+- Backend = authority
+- S3 = vault
+- Signed URL = temporary permission slip
+- Client = untrusted executor
+
+This model is production-proven and scalable.
