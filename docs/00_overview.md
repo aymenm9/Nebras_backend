@@ -17,8 +17,9 @@ Core principle:
 
 ## Roles
 
-### User
-- Read-only
+### User (Public / Guest)
+- No Login / Signup required
+- Read-only access
 - Browse categories
 - Stream content
 
@@ -42,9 +43,9 @@ Enforcement:
 # 3. High-Level Architecture (Top Down)
 
 ```
-Android App (Users)
-  ├─ Browse & Stream
-  ├─ Hidden Stats Dashboard
+Android App (Users / Guests)
+  ├─ Browse & Stream (Public Access)
+  ├─ No Login / Account Required
   │
   ▼
 Android App (Admins / Moderators)
@@ -53,9 +54,9 @@ Android App (Admins / Moderators)
   │
   ▼
 Backend API (Django + DRF)
-  ├─ Auth & RBAC (Email + Password)
-  ├─ Category hierarchy validation
-  ├─ Content metadata
+  ├─ Auth & RBAC (Staff Only: Email + Password)
+  ├─ Category hierarchy (Public View)
+  ├─ Content metadata (Public View)
   ├─ Upload orchestration (Hybrid: Direct & Signed URLs)
   ├─ Signed URL generation (Large files)
   ├─ Admin messaging (Polling/Refresh)
@@ -78,8 +79,8 @@ Backend is stateless and never handles media bytes.
 # 4. Backend Responsibilities (Exact Scope)
 
 Backend DOES:
-- Authenticate users (JWT)
-- Enforce roles
+- Authenticate Staff (Mods/Admins via JWT)
+- Enforce roles for management actions
 - Manage category tree
 - Store content metadata
 - Generate signed upload URLs
@@ -97,10 +98,12 @@ Backend DOES NOT:
 
 ## 5.1 User & Authentication
 
-**Model**: Standard Django `User` + `OneToOne` Profile.
+**Model**: Standard Django `User` + `OneToOne` Profile. (Used for Staff only)
 
 ### Authentication
-- **Login**: Email + Password.
+- **Login**: Email + Password (Moderators and Admins only).
+- **Signup**: No public signup. Accounts are created by Super Admin.
+- **Normal Users**: Anonymous access only. No accounts.
 
 ### Profile Model (1-to-1)
 ```
@@ -277,8 +280,7 @@ GET /stream/{content_id}
 ```
 
 Backend:
-- Auth check
-- Permission check
+- Public Access (No Auth) OR Staff Permission check
 - Generate signed GET URL (short TTL)
 
 Client:
@@ -383,3 +385,24 @@ Django logic = CRUD + orchestration.
 - Client = untrusted executor
 
 This model is production-proven and scalable.
+
+---
+
+# 15. API Standards
+
+## 15.1 Global Pagination
+- **Default Page Size**: 10 items per page.
+- **Query Parameter**: `?page=<number>`
+- **Response Format**:
+  ```json
+  {
+    "count": 102,
+    "next": "http://api.example.com/resource/?page=2",
+    "previous": null,
+    "results": [ ... ]
+  }
+  ```
+
+## 15.2 Filtering & Search
+- **Filtering**: Use exact field names (e.g., `?is_active=true` or `?created_by=5`).
+- **Search**: Use `?search=<term>` for fuzzy matching on supported fields (e.g., names, titles).

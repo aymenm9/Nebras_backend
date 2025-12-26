@@ -39,10 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'corsheaders',  
+    'storages',
     'rest_framework',
+    'django_filters',
     'drf_spectacular',
 
     'users',
+    'sections',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +134,12 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 SPECTACULAR_SETTINGS = {
@@ -138,7 +147,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Nebras API description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
+    
 }
 
 CORS_ALLOW_ALL_ORIGINS = True # for dev
@@ -151,3 +160,21 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',), 
     
 }
+
+
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+AWS_STORAGE_BUCKET_NAME = "nebras"
+AWS_ACCESS_KEY_ID = "1923894159f5bf490c758bfbfba75066"
+AWS_SECRET_ACCESS_KEY = "cf3c14486841e5e00214e2a820180a8f2bb32bd5bc0adff2700e803eeb2def90"
+
+AWS_S3_ENDPOINT_URL="https://6bb0001629192457dd8ede364681f27e.r2.cloudflarestorage.com"
+AWS_S3_REGION_NAME = "auto"
+
+
+
+
+AWS_S3_SIGNATURE_VERSION = "s3v4"
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = False
