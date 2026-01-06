@@ -4,7 +4,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Metadata, YoutubeVideo, R2File
-from .serializers import MetadataSerializerUpload, YoutubeVideoSerializer, R2FileSerializer, R2FileSerializerUpload
+from .serializers import MetadataSerializer, YoutubeVideoSerializer, R2FileSerializer, R2FileSerializerUpload
 from .utils import generate_presigned_url
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsModerator
@@ -16,7 +16,8 @@ class UploadYoutubeVideo(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated,IsModerator]
     serializer_class = YoutubeVideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['metadata__created_by']
+    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
+    search_fields = ['metadata__title','metadata__description']
     queryset = YoutubeVideo.objects.all()
 
     def get_queryset(self):
@@ -35,17 +36,12 @@ class UploadYoutubeVideoDetail(generics.RetrieveUpdateDestroyAPIView):
         return YoutubeVideo.objects.filter(metadata__created_by=self.request.user)
 
 
-
-class PublishYoutubeVideo(generics.ListAPIView):
-    serializer_class = YoutubeVideoSerializer
-    queryset = YoutubeVideo.objects.all()
-    
-
 class R2FileUpload(generics.ListAPIView):
     serializer_class = R2FileSerializer
     permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by']
+    filterset_fields = ['created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
+    search_fields = ['metadata__title','metadata__description']
     queryset = R2File.objects.all()
 
     def get_queryset(self):
@@ -54,14 +50,15 @@ class R2FileUpload(generics.ListAPIView):
         return R2File.objects.filter(created_by=self.request.user)
 
 class R2FileUploadCreate(generics.CreateAPIView):
-    serializer_class = R2FileSerializerUpload
     permission_classes = [IsAuthenticated,IsModerator]
+    serializer_class = R2FileSerializerUpload
     
 
 
 class R2FileUploadDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated,IsModerator]
     serializer_class = R2FileSerializer
-    queryset = R2File.objects.all()
+    queryset = R2File.objects.all().filter(upload_completed=True)
     
     def get_queryset(self):
         if self.request.user.is_superuser:

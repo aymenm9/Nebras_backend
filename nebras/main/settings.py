@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'sections',
     'content',
+    'public_apis',
 ]
 
 MIDDLEWARE = [
