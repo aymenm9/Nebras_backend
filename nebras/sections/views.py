@@ -5,6 +5,7 @@ from .serializers import MainSectionSerializer, SubSectionSerializer, SecondaryS
 
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.permissions import IsAuthenticated
 
 class MainSectionListCreateView(generics.ListCreateAPIView):
     """
@@ -12,7 +13,7 @@ class MainSectionListCreateView(generics.ListCreateAPIView):
     """
     queryset = MainSection.objects.all()
     serializer_class = MainSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by']
     search_fields = ['name']
@@ -28,7 +29,7 @@ class MainSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     """
     queryset = MainSection.objects.all()
     serializer_class = MainSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -41,7 +42,7 @@ class SubSectionListCreateView(generics.ListCreateAPIView):
     """
     queryset = SubSection.objects.all()
     serializer_class = SubSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','main_section']
     search_fields = ['name']
@@ -57,7 +58,7 @@ class SubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
     """
     queryset = SubSection.objects.all()
     serializer_class = SubSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
 
 
     def get_queryset(self):
@@ -71,7 +72,7 @@ class SecondarySubSectionListCreateView(generics.ListCreateAPIView):
     """
     queryset = SecondarySubSection.objects.all()
     serializer_class = SecondarySubSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','sub_section','sub_section__main_section']
     search_fields = ['name']
@@ -87,7 +88,7 @@ class SecondarySubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestro
     """
     queryset = SecondarySubSection.objects.all()
     serializer_class = SecondarySubSectionSerializer
-    permission_classes = [IsModerator]
+    permission_classes = [IsAuthenticated,IsModerator]
 
     def get_queryset(self):
         if self.request.user.is_superuser:

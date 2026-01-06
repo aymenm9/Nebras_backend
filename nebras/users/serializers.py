@@ -19,8 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         'is_superuser': {'read_only': True}}
 
 class ModeratorSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-
+    
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password','first_name','last_name']

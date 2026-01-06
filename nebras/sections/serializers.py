@@ -21,6 +21,12 @@ class SubSectionSerializer(serializers.ModelSerializer):
         validated_data['created_by'] = self.context['request'].user
         return super().create(validated_data)
 
+    def validate_main_section(self, value):
+        if value.created_by != self.context['request'].user:
+            raise serializers.ValidationError("You do not have permission to perform this action.")
+        return value
+    
+
 class SecondarySubSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SecondarySubSection
@@ -30,3 +36,8 @@ class SecondarySubSectionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user
         return super().create(validated_data)
+
+    def validate_sub_section(self, value):
+        if value.created_by != self.context['request'].user:
+            raise serializers.ValidationError("You do not have permission to perform this action.")
+        return value

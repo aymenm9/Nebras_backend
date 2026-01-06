@@ -6,6 +6,7 @@ from rest_framework import status, serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from drf_spectacular.utils import extend_schema
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
@@ -46,6 +47,9 @@ class MeView(APIView):
     """
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        responses={200: UserSerializer}
+    )
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
