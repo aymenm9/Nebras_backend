@@ -55,6 +55,8 @@ Android App (Admins / Moderators)
   ▼
 Backend API (Django + DRF)
   ├─ Auth & RBAC (Staff Only: Email + Password)
+  ├─ Public API (`api/public/`) -> Guest Access (No Auth)
+  ├─ Management API (`api/content/`, `api/sections/`) -> Staff Only
   ├─ Category hierarchy (Public View)
   ├─ Content metadata (Public View)
   ├─ Upload orchestration (Hybrid: Direct & Signed URLs)
@@ -110,17 +112,24 @@ Backend DOES NOT:
 Profile
 - user_id (FK to auth_user)
 - profile_image (Small file -> Direct Upload to R2)
-- is_banned (boolean, default=False)
-- ban_expires_at (datetime, nullable)
 ```
 
+### Ban Model (1-to-1 per User)
+Used for tracking the current ban state of a user.
+- **user**: OneToOne to User.
+- **is_banned**: Boolean flag.
+- **banned_end**: Expiration timestamp.
+- **banned_by**: FK to User who issued the ban.
+- **reason**: Text field for justification.
+
 ### Role Logic
-- **Moderator**: Group Chat (Polling/Refresh), generic permissions.
-- **Super Admin**: Can ban mods.
-    - **Ban Logic**: Can be permanent (`is_active=False`) or temporary (e.g., 15 days) using `ban_expires_at`.
+- **Moderator**: Access to content and section management.
+- **Super Admin**: Can manage moderators and issue/lift bans.
+    - **Ban Logic**: Enforcement is handled via `IsModerator` permission class which checks if a user has an active ban record (`is_banned=True` and `now < banned_end`).
 
 Notes:
 - Profile image is uploaded directly to R2 via Django backend (Small file flow).
+- Bans are dynamic; access is restored automatically once `banned_end` passes.
 
 ---
 
@@ -389,6 +398,10 @@ This model is production-proven and scalable.
 ---
 
 # 15. API Standards
+
+## 15.0 API Prefixes
+- **Public API**: `api/public/...` (Read-only, no authentication required).
+- **Management API**: `api/content/...`, `api/sections/...`, `api/users/...` (Full CRUD, requires Moderator/Admin authentication).
 
 ## 15.1 Global Pagination
 - **Default Page Size**: 10 items per page.

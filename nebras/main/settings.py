@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'users',
     'sections',
     'content',
+    'admin_apis',
     'public_apis',
 ]
 

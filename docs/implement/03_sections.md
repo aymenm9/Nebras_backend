@@ -96,11 +96,11 @@ This guide details how to manage the content hierarchy. The structure is strict:
 Use these for the client application (Android/Web public view).
 
 *   **Main Sections**:
-    *   List: `GET /api/sections/public/main/`
-    *   Detail: `GET /api/sections/public/main/<id>/`
+    *   List: `GET /api/public/sections/main/`
+    *   Detail: `GET /api/public/sections/main/<id>/`
 *   **Sub Sections**:
-    *   List: `GET /api/sections/public/sub/`
-    *   Detail: `GET /api/sections/public/sub/<id>/`
+    *   List: `GET /api/public/sections/sub/`
+    *   Detail: `GET /api/public/sections/sub/<id>/`
 *   **Secondary Sub Sections**:
-    *   List: `GET /api/sections/public/secondary/`
-    *   Detail: `GET /api/sections/public/secondary/<id>/`
+    *   List: `GET /api/public/sections/secondary/`
+    *   Detail: `GET /api/public/sections/secondary/<id>/`

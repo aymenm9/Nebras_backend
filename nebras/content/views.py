@@ -21,8 +21,6 @@ class UploadYoutubeVideo(generics.ListCreateAPIView):
     queryset = YoutubeVideo.objects.all()
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return YoutubeVideo.objects.all()
         return YoutubeVideo.objects.filter(metadata__created_by=self.request.user)
 
 class UploadYoutubeVideoDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -31,8 +29,6 @@ class UploadYoutubeVideoDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = YoutubeVideo.objects.all()
     
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return YoutubeVideo.objects.all()
         return YoutubeVideo.objects.filter(metadata__created_by=self.request.user)
 
 
@@ -40,14 +36,12 @@ class R2FileUpload(generics.ListAPIView):
     serializer_class = R2FileSerializer
     permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
+    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
     search_fields = ['metadata__title','metadata__description']
     queryset = R2File.objects.all()
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return R2File.objects.all()
-        return R2File.objects.filter(created_by=self.request.user)
+        return R2File.objects.filter(metadata__created_by=self.request.user)
 
 class R2FileUploadCreate(generics.CreateAPIView):
     permission_classes = [IsAuthenticated,IsModerator]
@@ -61,7 +55,5 @@ class R2FileUploadDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = R2File.objects.all().filter(upload_completed=True)
     
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return R2File.objects.all()
-        return R2File.objects.filter(created_by=self.request.user)
+        return R2File.objects.filter(metadata__created_by=self.request.user)
 

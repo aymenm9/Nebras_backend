@@ -33,18 +33,18 @@
 - `DELETE /api/sections/secondary/<id>/`: Delete secondary sub section.
 
 ## Public Endpoints (No Auth Required)
-- `GET /api/sections/public/main/`: List all main sections.
+- `GET /api/public/sections/main/`: List all main sections.
   - **Pagination**: Yes.
   - **Filters**: `created_by`.
   - **Search**: `name`.
-- `GET /api/sections/public/main/<id>/`: Get main section details.
-- `GET /api/sections/public/sub/`: List all sub sections.
+- `GET /api/public/sections/main/<id>/`: Get main section details.
+- `GET /api/public/sections/sub/`: List all sub sections.
   - **Pagination**: Yes.
   - **Filters**: `created_by`, `main_section`.
   - **Search**: `name`.
-- `GET /api/sections/public/sub/<id>/`: Get sub section details.
-- `GET /api/sections/public/secondary/`: List all secondary sub sections.
+- `GET /api/public/sections/sub/<id>/`: Get sub section details.
+- `GET /api/public/sections/secondary/`: List all secondary sub sections.
   - **Pagination**: Yes.
   - **Filters**: `created_by`, `sub_section`, `sub_section__main_section`.
   - **Search**: `name`.
-- `GET /api/sections/public/secondary/<id>/`: Get secondary sub section details.
+- `GET /api/public/sections/secondary/<id>/`: Get secondary sub section details.

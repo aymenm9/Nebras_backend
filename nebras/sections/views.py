@@ -19,8 +19,6 @@ class MainSectionListCreateView(generics.ListCreateAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return MainSection.objects.all()
         return MainSection.objects.all().filter(created_by=self.request.user)
 
 class MainSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -32,8 +30,6 @@ class MainSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView
     permission_classes = [IsAuthenticated,IsModerator]
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return MainSection.objects.all()
         return MainSection.objects.all().filter(created_by=self.request.user)
 
 class SubSectionListCreateView(generics.ListCreateAPIView):
@@ -48,8 +44,6 @@ class SubSectionListCreateView(generics.ListCreateAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return SubSection.objects.all()
         return SubSection.objects.all().filter(created_by=self.request.user)
 
 class SubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -62,8 +56,6 @@ class SubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView)
 
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return SubSection.objects.all()
         return SubSection.objects.all().filter(created_by=self.request.user)
 
 class SecondarySubSectionListCreateView(generics.ListCreateAPIView):
@@ -78,8 +70,6 @@ class SecondarySubSectionListCreateView(generics.ListCreateAPIView):
     search_fields = ['name']
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return SecondarySubSection.objects.all()
         return SecondarySubSection.objects.all().filter(created_by=self.request.user)
 
 class SecondarySubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -91,7 +81,5 @@ class SecondarySubSectionRetrieveUpdateDestroyView(generics.RetrieveUpdateDestro
     permission_classes = [IsAuthenticated,IsModerator]
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return SecondarySubSection.objects.all()
         return SecondarySubSection.objects.all().filter(created_by=self.request.user)
 

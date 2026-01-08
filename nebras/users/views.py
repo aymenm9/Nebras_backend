@@ -10,8 +10,8 @@ from drf_spectacular.utils import extend_schema
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
-from .serializers import LoginSerializer, UserSerializer, ModeratorSerializer
-from .permissions import IsSuperAdmin
+from .serializers import LoginSerializer, UserSerializer
+from .permissions import IsModerator
 
 class LoginView(APIView):
     """
@@ -45,7 +45,7 @@ class MeView(APIView):
     """
     Get current user profile.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsModerator]
 
     @extend_schema(
         responses={200: UserSerializer}
@@ -54,29 +54,3 @@ class MeView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
-class ModeratorListCreateView(generics.ListCreateAPIView):
-    """
-    List and create moderators (Super Admin only).
-    """
-    queryset = User.objects.all()
-    serializer_class = ModeratorSerializer
-    permission_classes = [IsSuperAdmin]
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['is_staff', 'is_superuser','is_active']
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    
-
-    def get_queryset(self):
-        return super().get_queryset().filter(is_staff=True).filter(is_superuser=False)
-
-
-class ModeratorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Retrieve, update, or delete a moderator (Super Admin only).
-    """
-    queryset = User.objects.all()
-    serializer_class = ModeratorSerializer
-    permission_classes = [IsSuperAdmin]
-
-    def get_queryset(self):
-        return super().get_queryset().filter(is_staff=True).filter(is_superuser=False)

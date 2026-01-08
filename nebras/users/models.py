@@ -7,3 +7,16 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+
+class Ban(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='ban')
+    reason = models.TextField(null=True, blank=True)
+    banned_start = models.DateTimeField(auto_now_add=True)
+    banned_end = models.DateTimeField()
+    banned_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='banned_by')
+    is_banned = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.user.username}'s Ban"
+        
