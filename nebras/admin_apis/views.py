@@ -11,6 +11,9 @@ from sections.serializers import MainSectionSerializer, SubSectionSerializer, Se
 from content.models import YoutubeVideo, R2File
 from content.serializers import YoutubeVideoSerializer, R2FileSerializer
 
+from chat.models import ChatMessage, MessageFile
+from chat.serializers import ChatMessageSerializer, MessageFileSerializer
+
 # Moderator Management (Moderators are super admin only)
 class AdminModeratorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)
@@ -97,4 +100,28 @@ class AdminR2FileListView(generics.ListAPIView):
 class AdminR2FileRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = R2File.objects.all()
     serializer_class = R2FileSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+
+# Chat Management (Super Admin only view and manage all chat logs)
+class AdminChatMessageListView(generics.ListAPIView):
+    queryset = ChatMessage.objects.all().order_by('-created_at')
+    serializer_class = ChatMessageSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    filterset_fields = ['user']
+    search_fields = ['message', 'user__username', 'user__email']
+
+class AdminChatMessageRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ChatMessage.objects.all()
+    serializer_class = ChatMessageSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+
+class AdminMessageFileListView(generics.ListAPIView):
+    queryset = MessageFile.objects.all()
+    serializer_class = MessageFileSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    filterset_fields = ['user', 'message']
+
+class AdminMessageFileRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MessageFile.objects.all()
+    serializer_class = MessageFileSerializer
     permission_classes = [IsAuthenticated, IsSuperAdmin]

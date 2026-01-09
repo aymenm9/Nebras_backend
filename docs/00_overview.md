@@ -339,9 +339,8 @@ Solving those requires DRM (out of MVP scope).
 - Signed URLs
 - Private buckets
 - Role-based API
-- In-app admin panel
-- Admin/moderator messaging via REST (Polling/Refresh on client).
-- No websockets (Feature deferred).
+- In-app admin panel (Basic)
+- Admin/moderator messaging via WebSockets (Real-time).
 - No transcoding
 - No analytics
 
@@ -401,7 +400,8 @@ This model is production-proven and scalable.
 
 ## 15.0 API Prefixes
 - **Public API**: `api/public/...` (Read-only, no authentication required).
-- **Management API**: `api/content/...`, `api/sections/...`, `api/users/...` (Full CRUD, requires Moderator/Admin authentication).
+- **Management API**: `api/chat/...`, `api/content/...`, `api/sections/...`, `api/users/...` (Full CRUD, requires Moderator/Admin authentication).
+- **Admin API**: `api/admin/...` (Super Admin only endpoints for global oversight).
 
 ## 15.1 Global Pagination
 - **Default Page Size**: 10 items per page.

@@ -1,99 +1,75 @@
 # Moderator Management Guide
 
-This guide is for **Super Admins** to manage the staff (Moderators).
-**All endpoints require**: `Authorization: Bearer <super_admin_token>`
+This document defines the workflows for Super Admins to manage staff accounts.
+**Auth Required**: Super Admin Token.
 
-## 1. List All Moderators
-**Endpoint**: `GET /api/users/moderators/`
-**Purpose**: View all staff members (excluding Super Admins).
+## Workflow 1: Manage Moderators
+View and manage staff accounts.
 
-**Response**:
-```
-[
+### Step 1: List Moderators
+- **Endpoint**: `GET /api/users/moderators/`
+- **Optional Params**: `?search=<name>`, `?page=1`
+- **Action**: Render the list of users.
+  ```json
+  [
+    {
+      "id": 2,
+      "username": "mod1",
+      "email": "mod1@example.com",
+      "first_name": "John",
+      "last_name": "Doe",
+      "is_active": true
+    },
+    ...
+  ]
+  ```
+
+### Step 2: Create Moderator
+- **Endpoint**: `POST /api/users/moderators/`
+- **Body**:
+  ```json
   {
-    "id": 2,
-    "username": "mod1",
-    "email": "mod1@example.com",
-    "first_name": "John",
+    "username": "new_mod",
+    "email": "mod@email.com",
+    "password": "secure_password",
+    "first_name": "Jane",
     "last_name": "Doe"
-  },
-  ...
-]
-```
+  }
+  ```
 
-### Filtering & Search
-- **Filter**: `/api/users/moderators/?is_active=false`
-- **Search**: `/api/users/moderators/?search=john`
-- **Pagination**: `/api/users/moderators/?page=2`
+### Step 3: Update Moderator
+- **Endpoint**: `PATCH /api/users/moderators/<id>/`
+- **Body**: Any subset of fields (e.g., `{ "first_name": "Janet" }`).
 
----
-
-## 2. Create Moderator
-**Endpoint**: `POST /api/users/moderators/`
-**Purpose**: Create a new staff account.
-**Note**: `is_staff` is automatically set to `true`.
-
-**Request Body**:
-```json
-{
-  "username": "new_mod",
-  "email": "mod@email.com",
-  "password": "securePass123!",
-  "first_name": "Jane",
-  "last_name": "Doe"
-}
-```
+### Step 4: Delete Moderator
+- **Endpoint**: `DELETE /api/users/moderators/<id>/`
 
 ---
 
-## 3. Update Moderator
-**Endpoint**: `PATCH /api/users/moderators/<id>/`
-**Purpose**: Update details like email or name.
-**Note**: You cannot change a user's password here (use a separate reset flow if needed).
+## Workflow 2: Ban Management
+Temporarily block a moderator without deleting them.
 
-**Request Body** (All fields optional):
-```json
-{
-  "first_name": "Janet",
-  "email": "newemail@example.com"
-}
-```
+### Step 1: Check Ban Status
+- **Endpoint**: `GET /api/users/bans/?user=<user_id>`
+- **Action**: Check if any active ban exists.
 
----
+### Step 2: Apply Ban
+- **Endpoint**: `POST /api/users/bans/`
+- **Body**:
+  ```json
+  {
+    "user": 5,
+    "reason": "Policy violation",
+    "banned_end": "2025-12-31T23:59:59Z",
+    "is_banned": true
+  }
+  ```
 
-## 4. Delete Moderator
-**Endpoint**: `DELETE /api/users/moderators/<id>/`
-**Purpose**: Permanently remove a moderator account.
-
----
-
-## 5. Ban Management
-Banning is used to temporarily or permanently block a moderator from using their account without deleting it.
-
-### Ban a User
-**Endpoint**: `POST /api/users/bans/`
-**Request Body**:
-```json
-{
-  "user": 2,
-  "reason": "Repeated policy violations",
-  "banned_end": "2026-02-07T00:00:00Z",
-  "is_banned": true
-}
-```
-*   `user`: The ID of the moderator.
-*   `banned_end`: The UTC timestamp when the ban expires.
-*   `is_banned`: Must be `true` to active the ban.
-
-### List Active Bans
-**Endpoint**: `GET /api/users/bans/?is_banned=true`
-
-### Lift a Ban Early
-**Endpoint**: `PATCH /api/users/bans/<id>/`
-**Request Body**:
-```json
-{
-  "is_banned": false
-}
-```
-Once `is_banned` is set to `false`, the user instantly regains access, even if `banned_end` is still in the future.
+### Step 3: Lift Ban
+- **Endpoint**: `PATCH /api/users/bans/<ban_id>/`
+- **Body**:
+  ```json
+  {
+    "is_banned": false
+  }
+  ```

@@ -26,4 +26,10 @@ urlpatterns = [
     
     path('content/files/', views.AdminR2FileListView.as_view(), name='admin-file-list'),
     path('content/files/<int:pk>/', views.AdminR2FileRetrieveUpdateDestroyView.as_view(), name='admin-file-detail'),
+
+    # Chat Management
+    path('chat/messages/', views.AdminChatMessageListView.as_view(), name='admin-chat-message-list'),
+    path('chat/messages/<int:pk>/', views.AdminChatMessageRetrieveUpdateDestroyView.as_view(), name='admin-chat-message-detail'),
+    path('chat/files/', views.AdminMessageFileListView.as_view(), name='admin-chat-file-list'),
+    path('chat/files/<int:pk>/', views.AdminMessageFileRetrieveUpdateDestroyView.as_view(), name='admin-chat-file-detail'),
 ]

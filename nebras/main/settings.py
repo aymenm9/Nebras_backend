@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,17 +39,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+
     'corsheaders',  
     'storages',
     'rest_framework',
     'django_filters',
     'drf_spectacular',
 
+
     'users',
     'sections',
     'content',
     'admin_apis',
     'public_apis',
+    'chat',
+
+    "channels",
+    "channels_redis",
 ]
 
 MIDDLEWARE = [
@@ -61,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 ROOT_URLCONF = 'main.urls'
 
@@ -181,3 +189,28 @@ AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = False
+
+import redis
+
+r = redis.Redis(
+    host='redis-17665.crce198.eu-central-1-3.ec2.cloud.redislabs.com',
+    port=17665,
+    decode_responses=True,
+    username="default",
+    password="ceXylQ2IrWShhbX24uJ3aqdZGhpkZbWL",
+)
+
+
+# ASGI Configuration
+ASGI_APPLICATION = 'main.asgi.application'  # Replace 'nebras' with your project name
+
+# Channel Layers (Redis)
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [("redis-17665.crce198.eu-central-1-3.ec2.cloud.redislabs.com", 17665)],
+            # Example: ("redis-12345.cloud.redislabs.com", 16379)
+        },
+    },
+}

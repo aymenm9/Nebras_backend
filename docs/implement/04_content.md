@@ -1,47 +1,75 @@
-# Content Management & Delivery Guide
+# Content Management Guide
 
-This guide explains how to manage and access content (YouTube videos, PDF books, Audio files, etc.).
+This document defines the workflows for uploading and managing media content.
 
-## 1. Staff Management (Auth Required)
+## Workflow 1: YouTube Content
+Add a strictly linked YouTube video.
 
-### YouTube Videos
-*   **List/Create**: `POST /api/content/youtube/`
-*   **Detail/Update/Delete**: `GET/PATCH/DELETE /api/content/youtube/<id>/`
-
-### File Uploads (R2)
-1.  **Initiate Upload**: `POST /api/content/files/upload/`
-    *   This returns a `file_url` which is a **presigned PUT URL**.
-2.  **Upload to R2**: Use a standard HTTP PUT request to the `file_url` with the file binary.
-3.  **Completion**: Once the file is successfully uploaded to R2, you **MUST** send a `PATCH` request to `/api/content/files/<id>/` with `{ "upload_completed": true }`.
-    *   Files with `upload_completed=False` will **NOT** appear in the public API.
-
----
-
-## 2. Public Access (No Auth)
-
-Use these for the client application (Android/Web public view) under the `/api/public/` prefix.
-
-### YouTube Videos
-*   **List**: `GET /api/public/youtube/`
-    *   **Filters**: `?metadata__subsection=1`, `?metadata__content_type=VIDEO`
-    *   **Search**: `?search=Physics`
-*   **Detail**: `GET /api/public/youtube/<id>/`
-
-### R2 Files (Books / Audio)
-*   **List**: `GET /api/public/files/`
-    *   This returns objects including a `file_url` which is a **presigned GET URL** for streaming/downloading.
-*   **Detail**: `GET /api/public/files/<id>/`
-
-### Metadata (Generic Search)
-*   **List**: `GET /api/public/metadata/`
-    *   Useful for searching across all types of content.
-*   **Detail**: `GET /api/public/metadata/<id>/`
+### Step 1: Create Entry
+- **Endpoint**: `POST /api/content/youtube/`
+- **Body**:
+  ```json
+  {
+    "title": "Video Title",
+    "video_url": "https://youtube.com/watch?v=...",
+    "metadata": { "subsection": 1 }
+  }
+  ```
 
 ---
 
-## 3. Filtering & Search Tips
-All public list endpoints support:
-*   `search`: Fuzzy search on titles and descriptions.
-*   `metadata__subsection`: Filter by subsection ID.
-*   `metadata__subsection__main_section`: Filter by main section ID.
-*   `metadata__content_type`: Filter by type (`BOOK`, `AUDIO`, `VIDEO`).
+## Workflow 2: File Upload (Presigned URL)
+Upload a file (PDF, Audio, etc.) to Object Storage (R2).
+
+### Step 1: Initialize Upload
+- **Endpoint**: `POST /api/content/files/upload/`
+- **Body**:
+  ```json
+  {
+    "filename": "book.pdf",
+    "content_type": "application/pdf"
+  }
+  ```
+- **Response**: Returns a `file_url`, `id`, and storage details.
+  ```json
+  {
+    "id": 105,
+    "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
+    "storage_key": "books/105.pdf"
+  }
+  ```
+
+### Step 2: Upload to R2 (Client-Side)
+- **Action**: Perform a `PUT` request to the `file_url` received in Step 1.
+- **Body**: The raw file binary.
+- **Headers**: `Content-Type: application/pdf`
+
+### Step 3: Confirm Completion
+- **Endpoint**: `PATCH /api/content/files/<id>/`
+- **Body**:
+  ```json
+  { "upload_completed": true }
+  ```
+- **Result**: The file is now visible in the Public API.
+
+---
+
+## Workflow 3: Public Consumption
+Fetch content for end-users (No Auth).
+
+### Step 1: List Content
+- **Endpoint**: `GET /api/public/metadata/`
+- **Filters**: `?metadata__subsection=<id>`, `?search=<term>`
+
+### Step 2: Get Streaming URL
+- **Endpoint**: `GET /api/public/files/<id>/`
+- **Response**: Contains a `file_url` (Presigned GET URL).
+  ```json
+  {
+    "id": 105,
+    "title": "My Book",
+    "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
+    "mime_type": "application/pdf"
+  }
+  ```
+- **Action**: Stream/Download directly from that URL.
