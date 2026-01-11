@@ -1,0 +1,3705 @@
+openapi: 3.0.3
+info:
+  title: Nebras API
+  version: 1.0.0
+  description: Nebras API description
+paths:
+  /api/admin/bans/:
+    get:
+      operationId: admin_bans_list
+      parameters:
+      - in: query
+        name: banned_end
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: banned_start
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: is_banned
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBanList'
+          description: ''
+    post:
+      operationId: admin_bans_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ban'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ban'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ban'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+  /api/admin/bans/{id}/:
+    get:
+      operationId: admin_bans_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+    put:
+      operationId: admin_bans_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ban'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Ban'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Ban'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+    patch:
+      operationId: admin_bans_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBan'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBan'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBan'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ban'
+          description: ''
+    delete:
+      operationId: admin_bans_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/chat/files/:
+    get:
+      operationId: admin_chat_files_list
+      parameters:
+      - in: query
+        name: message
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageFileList'
+          description: ''
+  /api/admin/chat/files/{id}/:
+    get:
+      operationId: admin_chat_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    put:
+      operationId: admin_chat_files_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    patch:
+      operationId: admin_chat_files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    delete:
+      operationId: admin_chat_files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/chat/messages/:
+    get:
+      operationId: admin_chat_messages_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChatMessageList'
+          description: ''
+  /api/admin/chat/messages/{id}/:
+    get:
+      operationId: admin_chat_messages_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    put:
+      operationId: admin_chat_messages_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    patch:
+      operationId: admin_chat_messages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    delete:
+      operationId: admin_chat_messages_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/content/files/:
+    get:
+      operationId: admin_content_files_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedR2FileList'
+          description: ''
+  /api/admin/content/files/{id}/:
+    get:
+      operationId: admin_content_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    put:
+      operationId: admin_content_files_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/R2File'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    patch:
+      operationId: admin_content_files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    delete:
+      operationId: admin_content_files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/content/youtube/:
+    get:
+      operationId: admin_content_youtube_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedYoutubeVideoList'
+          description: ''
+  /api/admin/content/youtube/{id}/:
+    get:
+      operationId: admin_content_youtube_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    put:
+      operationId: admin_content_youtube_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    patch:
+      operationId: admin_content_youtube_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    delete:
+      operationId: admin_content_youtube_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/moderators/:
+    get:
+      operationId: admin_moderators_list
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - in: query
+        name: is_staff
+        schema:
+          type: boolean
+      - in: query
+        name: is_superuser
+        schema:
+          type: boolean
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedModeratorList'
+          description: ''
+    post:
+      operationId: admin_moderators_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Moderator'
+          description: ''
+  /api/admin/moderators/{id}/:
+    get:
+      operationId: admin_moderators_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Moderator'
+          description: ''
+    put:
+      operationId: admin_moderators_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Moderator'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Moderator'
+          description: ''
+    patch:
+      operationId: admin_moderators_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedModerator'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedModerator'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedModerator'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Moderator'
+          description: ''
+    delete:
+      operationId: admin_moderators_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/sections/main/:
+    get:
+      operationId: admin_sections_main_list
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMainSectionList'
+          description: ''
+  /api/admin/sections/main/{id}/:
+    get:
+      operationId: admin_sections_main_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    put:
+      operationId: admin_sections_main_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    patch:
+      operationId: admin_sections_main_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    delete:
+      operationId: admin_sections_main_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/sections/secondary/:
+    get:
+      operationId: admin_sections_secondary_list
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sub_section
+        schema:
+          type: integer
+      - in: query
+        name: sub_section__main_section
+        schema:
+          type: integer
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSecondarySubSectionList'
+          description: ''
+  /api/admin/sections/secondary/{id}/:
+    get:
+      operationId: admin_sections_secondary_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    put:
+      operationId: admin_sections_secondary_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    patch:
+      operationId: admin_sections_secondary_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    delete:
+      operationId: admin_sections_secondary_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/admin/sections/sub/:
+    get:
+      operationId: admin_sections_sub_list
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - in: query
+        name: main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubSectionList'
+          description: ''
+  /api/admin/sections/sub/{id}/:
+    get:
+      operationId: admin_sections_sub_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    put:
+      operationId: admin_sections_sub_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    patch:
+      operationId: admin_sections_sub_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    delete:
+      operationId: admin_sections_sub_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/chat/files/:
+    get:
+      operationId: chat_files_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageFileList'
+          description: ''
+    post:
+      operationId: chat_files_create
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+  /api/chat/files/{id}/:
+    get:
+      operationId: chat_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    put:
+      operationId: chat_files_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MessageFile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    patch:
+      operationId: chat_files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMessageFile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageFile'
+          description: ''
+    delete:
+      operationId: chat_files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/chat/messages/:
+    get:
+      operationId: chat_messages_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChatMessageList'
+          description: ''
+  /api/chat/messages/{id}/:
+    get:
+      operationId: chat_messages_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    put:
+      operationId: chat_messages_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ChatMessage'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    patch:
+      operationId: chat_messages_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChatMessage'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessage'
+          description: ''
+    delete:
+      operationId: chat_messages_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - chat
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/content/files/:
+    get:
+      operationId: content_files_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__secondary_subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedR2FileList'
+          description: ''
+  /api/content/files/{id}/:
+    get:
+      operationId: content_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    put:
+      operationId: content_files_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/R2File'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    patch:
+      operationId: content_files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedR2File'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+    delete:
+      operationId: content_files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/content/files/upload/:
+    post:
+      operationId: content_files_upload_create
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R2FileSerializerUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/R2FileSerializerUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/R2FileSerializerUpload'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2FileSerializerUpload'
+          description: ''
+  /api/content/youtube/:
+    get:
+      operationId: content_youtube_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__secondary_subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedYoutubeVideoList'
+          description: ''
+    post:
+      operationId: content_youtube_create
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+  /api/content/youtube/{id}/:
+    get:
+      operationId: content_youtube_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    put:
+      operationId: content_youtube_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/YoutubeVideo'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    patch:
+      operationId: content_youtube_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedYoutubeVideo'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+    delete:
+      operationId: content_youtube_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/public/files/:
+    get:
+      operationId: public_files_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__secondary_subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedR2FileList'
+          description: ''
+  /api/public/files/{id}/:
+    get:
+      operationId: public_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+  /api/public/metadata/:
+    get:
+      operationId: public_metadata_list
+      parameters:
+      - in: query
+        name: content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: secondary_subsection
+        schema:
+          type: integer
+      - in: query
+        name: subsection
+        schema:
+          type: integer
+      - in: query
+        name: subsection__main_section
+        schema:
+          type: integer
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMetadataList'
+          description: ''
+  /api/public/metadata/{id}/:
+    get:
+      operationId: public_metadata_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+          description: ''
+  /api/public/sections/main/:
+    get:
+      operationId: public_sections_main_list
+      description: Public list of Main Sections (No Auth).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMainSectionList'
+          description: ''
+  /api/public/sections/main/{id}/:
+    get:
+      operationId: public_sections_main_retrieve
+      description: Public retrieve of Main Section (No Auth).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+  /api/public/sections/secondary/:
+    get:
+      operationId: public_sections_secondary_list
+      description: Public list of Secondary Sub Sections (No Auth).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sub_section
+        schema:
+          type: integer
+      - in: query
+        name: sub_section__main_section
+        schema:
+          type: integer
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSecondarySubSectionList'
+          description: ''
+  /api/public/sections/secondary/{id}/:
+    get:
+      operationId: public_sections_secondary_retrieve
+      description: Public retrieve of Secondary Sub Section (No Auth).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+  /api/public/sections/sub/:
+    get:
+      operationId: public_sections_sub_list
+      description: Public list of Sub Sections (No Auth).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - in: query
+        name: main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubSectionList'
+          description: ''
+  /api/public/sections/sub/{id}/:
+    get:
+      operationId: public_sections_sub_retrieve
+      description: Public retrieve of Sub Section (No Auth).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+  /api/public/youtube/:
+    get:
+      operationId: public_youtube_list
+      parameters:
+      - in: query
+        name: metadata__content_type
+        schema:
+          type: string
+          enum:
+          - audio
+          - document
+          - video
+          - youtube
+        description: |-
+          * `video` - Video
+          * `audio` - Audio
+          * `document` - Document
+          * `youtube` - Youtube
+      - in: query
+        name: metadata__created_by
+        schema:
+          type: integer
+      - in: query
+        name: metadata__secondary_subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection
+        schema:
+          type: integer
+      - in: query
+        name: metadata__subsection__main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedYoutubeVideoList'
+          description: ''
+  /api/public/youtube/{id}/:
+    get:
+      operationId: public_youtube_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - public
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/YoutubeVideo'
+          description: ''
+  /api/sections/main/:
+    get:
+      operationId: sections_main_list
+      description: List and create Main Sections (Moderators only).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMainSectionList'
+          description: ''
+    post:
+      operationId: sections_main_create
+      description: List and create Main Sections (Moderators only).
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+  /api/sections/main/{id}/:
+    get:
+      operationId: sections_main_retrieve
+      description: Retrieve, update, or delete a Main Section (Super Admin only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    put:
+      operationId: sections_main_update
+      description: Retrieve, update, or delete a Main Section (Super Admin only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MainSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    patch:
+      operationId: sections_main_partial_update
+      description: Retrieve, update, or delete a Main Section (Super Admin only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMainSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MainSection'
+          description: ''
+    delete:
+      operationId: sections_main_destroy
+      description: Retrieve, update, or delete a Main Section (Super Admin only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/sections/secondary/:
+    get:
+      operationId: sections_secondary_list
+      description: List and create Secondary Sub Sections (Moderators only).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: sub_section
+        schema:
+          type: integer
+      - in: query
+        name: sub_section__main_section
+        schema:
+          type: integer
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSecondarySubSectionList'
+          description: ''
+    post:
+      operationId: sections_secondary_create
+      description: List and create Secondary Sub Sections (Moderators only).
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+  /api/sections/secondary/{id}/:
+    get:
+      operationId: sections_secondary_retrieve
+      description: Retrieve, update, or delete a Secondary Sub Section (Moderators
+        only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    put:
+      operationId: sections_secondary_update
+      description: Retrieve, update, or delete a Secondary Sub Section (Moderators
+        only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SecondarySubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    patch:
+      operationId: sections_secondary_partial_update
+      description: Retrieve, update, or delete a Secondary Sub Section (Moderators
+        only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSecondarySubSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecondarySubSection'
+          description: ''
+    delete:
+      operationId: sections_secondary_destroy
+      description: Retrieve, update, or delete a Secondary Sub Section (Moderators
+        only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/sections/sub/:
+    get:
+      operationId: sections_sub_list
+      description: List and create Sub Sections (Moderators only).
+      parameters:
+      - in: query
+        name: created_by
+        schema:
+          type: integer
+      - in: query
+        name: main_section
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubSectionList'
+          description: ''
+    post:
+      operationId: sections_sub_create
+      description: List and create Sub Sections (Moderators only).
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+  /api/sections/sub/{id}/:
+    get:
+      operationId: sections_sub_retrieve
+      description: Retrieve, update, or delete a Sub Section (Moderators only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    put:
+      operationId: sections_sub_update
+      description: Retrieve, update, or delete a Sub Section (Moderators only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SubSection'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    patch:
+      operationId: sections_sub_partial_update
+      description: Retrieve, update, or delete a Sub Section (Moderators only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubSection'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubSection'
+          description: ''
+    delete:
+      operationId: sections_sub_destroy
+      description: Retrieve, update, or delete a Sub Section (Moderators only).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - sections
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      description: Login with username or email.
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      description: Get current user profile.
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/token/refresh/:
+    post:
+      operationId: users_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+components:
+  schemas:
+    Ban:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+          nullable: true
+        banned_start:
+          type: string
+          format: date-time
+          readOnly: true
+        banned_end:
+          type: string
+          format: date-time
+        is_banned:
+          type: boolean
+        user:
+          type: integer
+        banned_by:
+          type: integer
+      required:
+      - banned_by
+      - banned_end
+      - banned_start
+      - id
+      - user
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        message:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageFile'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - files
+      - id
+      - message
+      - updated_at
+      - user
+      - username
+    ContentTypeEnum:
+      enum:
+      - video
+      - audio
+      - document
+      - youtube
+      type: string
+      description: |-
+        * `video` - Video
+        * `audio` - Audio
+        * `document` - Document
+        * `youtube` - Youtube
+    MainSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - name
+    MessageFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        message:
+          type: integer
+          readOnly: true
+          nullable: true
+        file:
+          type: string
+          format: uri
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - file
+      - id
+      - message
+      - user
+    Metadata:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 512
+        content_type:
+          $ref: '#/components/schemas/ContentTypeEnum'
+        description:
+          type: string
+          nullable: true
+        thumbnail:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        subsection:
+          type: integer
+        secondary_subsection:
+          type: integer
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+      required:
+      - content_type
+      - created_at
+      - created_by
+      - id
+      - subsection
+      - title
+      - updated_at
+    Moderator:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - id
+      - password
+      - username
+    PaginatedBanList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ban'
+    PaginatedChatMessageList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatMessage'
+    PaginatedMainSectionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MainSection'
+    PaginatedMessageFileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageFile'
+    PaginatedMetadataList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metadata'
+    PaginatedModeratorList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Moderator'
+    PaginatedR2FileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/R2File'
+    PaginatedSecondarySubSectionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecondarySubSection'
+    PaginatedSubSectionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubSection'
+    PaginatedYoutubeVideoList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/YoutubeVideo'
+    PatchedBan:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        reason:
+          type: string
+          nullable: true
+        banned_start:
+          type: string
+          format: date-time
+          readOnly: true
+        banned_end:
+          type: string
+          format: date-time
+        is_banned:
+          type: boolean
+        user:
+          type: integer
+        banned_by:
+          type: integer
+    PatchedChatMessage:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        message:
+          type: string
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageFile'
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedMainSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+    PatchedMessageFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        message:
+          type: integer
+          readOnly: true
+          nullable: true
+        file:
+          type: string
+          format: uri
+        user:
+          type: integer
+          readOnly: true
+    PatchedModerator:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+    PatchedR2File:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        metadata_info:
+          $ref: '#/components/schemas/Metadata'
+        file_url:
+          type: string
+          readOnly: true
+        file_key:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+          nullable: true
+          maxLength: 512
+        file_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        file_type:
+          type: string
+          nullable: true
+          maxLength: 100
+        upload_completed:
+          type: boolean
+        metadata:
+          type: integer
+    PatchedSecondarySubSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sub_section:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+    PatchedSubSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        main_section:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+    PatchedYoutubeVideo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        video_url:
+          type: string
+          maxLength: 512
+        metadata_info:
+          $ref: '#/components/schemas/Metadata'
+    Profile:
+      type: object
+      properties:
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+    R2File:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        metadata_info:
+          $ref: '#/components/schemas/Metadata'
+        file_url:
+          type: string
+          readOnly: true
+        file_key:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+          nullable: true
+          maxLength: 512
+        file_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        file_type:
+          type: string
+          nullable: true
+          maxLength: 100
+        upload_completed:
+          type: boolean
+        metadata:
+          type: integer
+      required:
+      - file_key
+      - file_url
+      - id
+      - metadata
+      - metadata_info
+    R2FileSerializerUpload:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        metadata_info:
+          $ref: '#/components/schemas/Metadata'
+        file_url:
+          type: string
+          readOnly: true
+        file_key:
+          type: string
+          readOnly: true
+        filename:
+          type: string
+          nullable: true
+          maxLength: 512
+        file_size:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        file_type:
+          type: string
+          nullable: true
+          maxLength: 100
+        upload_completed:
+          type: boolean
+        metadata:
+          type: integer
+      required:
+      - file_key
+      - file_url
+      - id
+      - metadata
+      - metadata_info
+    SecondarySubSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sub_section:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - name
+      - sub_section
+    SubSection:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        main_section:
+          type: integer
+        name:
+          type: string
+          maxLength: 255
+        order_index:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - id
+      - main_section
+      - name
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        profile:
+          allOf:
+          - $ref: '#/components/schemas/Profile'
+          readOnly: true
+        is_super_admin:
+          type: boolean
+          readOnly: true
+        is_moderator:
+          type: boolean
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+      required:
+      - id
+      - is_moderator
+      - is_super_admin
+      - profile
+      - username
+    YoutubeVideo:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        video_url:
+          type: string
+          maxLength: 512
+        metadata_info:
+          $ref: '#/components/schemas/Metadata'
+      required:
+      - id
+      - metadata_info
+      - video_url
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -10,10 +10,10 @@ class MetadataSerializer(serializers.ModelSerializer):
 
     
 class YoutubeVideoSerializer(serializers.ModelSerializer):
-    metadata = MetadataSerializer()
+    metadata_info = MetadataSerializer()
     class Meta:
         model = YoutubeVideo
-        fields = ['id', 'video_url', 'metadata']
+        fields = ['id', 'video_url', 'metadata_info']
         
     def create(self, validated_data):
         metadata_data = validated_data.pop('metadata')
@@ -23,26 +23,26 @@ class YoutubeVideoSerializer(serializers.ModelSerializer):
         return youtube_video
 
 class R2FileSerializer(serializers.ModelSerializer):
-    metadata = MetadataSerializer(source='metadata')
+    metadata_info = MetadataSerializer(source='metadata')
     file_url = serializers.SerializerMethodField()
     
     class Meta:
         model = R2File
         fields = '__all__'
-        read_only_fields = ['file_url', 'file_key', 'created_by', 'created_at', 'updated_at']
+        read_only_fields = ['file_url', 'file_key', 'created_by', 'created_at', 'updated_at', 'metadata_info']
 
     def get_file_url(self, obj):
         return generate_presigned_url(obj, method='get')
     
 
 class R2FileSerializerUpload(serializers.ModelSerializer):
-    metadata = MetadataSerializer(source='metadata')
+    metadata_info = MetadataSerializer(source='metadata')
     file_url = serializers.SerializerMethodField()
     
     class Meta:
         model = R2File
         fields = '__all__'
-        read_only_fields = ['file_url', 'file_key', 'created_by', 'created_at', 'updated_at']
+        read_only_fields = ['file_url', 'file_key', 'created_by', 'created_at', 'updated_at','metadata_info']
 
     def get_file_url(self, obj):
         return generate_presigned_url(obj, method='put')

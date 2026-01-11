@@ -87,7 +87,7 @@ class PublishMetadataDetail(generics.RetrieveAPIView):
 class PublishR2File(generics.ListAPIView):
     serializer_class = R2FileSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
+    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
     search_fields = ['metadata__title','metadata__description']
     queryset = R2File.objects.all().filter(upload_completed=True)
 

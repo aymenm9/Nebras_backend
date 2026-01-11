@@ -17,6 +17,10 @@ class LoginView(APIView):
     """
     Login with username or email.
     """
+    @extend_schema(
+        request=LoginSerializer,
+        responses={200: UserSerializer}
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

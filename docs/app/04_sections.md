@@ -48,3 +48,9 @@
   - **Filters**: `created_by`, `sub_section`, `sub_section__main_section`.
   - **Search**: `name`.
 - `GET /api/public/sections/secondary/<id>/`: Get secondary sub section details.
+## Super Admin Audit (Admin Panel)
+Separate endpoints for Super Admins to oversee all sections at once.
+- `GET /api/admin/sections/main/`: List all main sections.
+- `GET /api/admin/sections/sub/`: List all sub sections.
+- `GET /api/admin/sections/secondary/`: List all secondary sub sections.
+- `GET/PATCH/DELETE /api/admin/sections/<type>/<id>/`: Directly manage any section.

@@ -7,7 +7,7 @@ This document defines the workflows for Super Admins to manage staff accounts.
 View and manage staff accounts.
 
 ### Step 1: List Moderators
-- **Endpoint**: `GET /api/users/moderators/`
+- **Endpoint**: `GET /api/admin/moderators/`
 - **Optional Params**: `?search=<name>`, `?page=1`
 - **Action**: Render the list of users.
   ```json
@@ -25,7 +25,7 @@ View and manage staff accounts.
   ```
 
 ### Step 2: Create Moderator
-- **Endpoint**: `POST /api/users/moderators/`
+- **Endpoint**: `POST /api/admin/moderators/`
 - **Body**:
   ```json
   {
@@ -38,11 +38,11 @@ View and manage staff accounts.
   ```
 
 ### Step 3: Update Moderator
-- **Endpoint**: `PATCH /api/users/moderators/<id>/`
+- **Endpoint**: `PATCH /api/admin/moderators/<id>/`
 - **Body**: Any subset of fields (e.g., `{ "first_name": "Janet" }`).
 
 ### Step 4: Delete Moderator
-- **Endpoint**: `DELETE /api/users/moderators/<id>/`
+- **Endpoint**: `DELETE /api/admin/moderators/<id>/`
 
 ---
 
@@ -50,11 +50,11 @@ View and manage staff accounts.
 Temporarily block a moderator without deleting them.
 
 ### Step 1: Check Ban Status
-- **Endpoint**: `GET /api/users/bans/?user=<user_id>`
+- **Endpoint**: `GET /api/admin/bans/?user=<user_id>`
 - **Action**: Check if any active ban exists.
 
 ### Step 2: Apply Ban
-- **Endpoint**: `POST /api/users/bans/`
+- **Endpoint**: `POST /api/admin/bans/`
 - **Body**:
   ```json
   {
@@ -66,7 +66,7 @@ Temporarily block a moderator without deleting them.
   ```
 
 ### Step 3: Lift Ban
-- **Endpoint**: `PATCH /api/users/bans/<ban_id>/`
+- **Endpoint**: `PATCH /api/admin/bans/<ban_id>/`
 - **Body**:
   ```json
   {

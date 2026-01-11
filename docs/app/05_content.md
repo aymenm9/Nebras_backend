@@ -39,3 +39,8 @@
   - **Filters**: `created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
   - **Search**: `metadata__title`, `metadata__description`.
 - `GET /api/public/files/<id>/`: Get R2 file details.
+## Super Admin Audit (Admin Panel)
+Separate endpoints for Super Admins to oversee all content items at once.
+- `GET /api/admin/content/youtube/`: View list of all YouTube content.
+- `GET /api/admin/content/files/`: View list of all file content.
+- `GET/PATCH/DELETE /api/admin/content/<type>/<id>/`: Directly manage any content item.
