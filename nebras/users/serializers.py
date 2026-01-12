@@ -8,7 +8,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['profile_image']
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer(read_only=True)
+    profile = ProfileSerializer()
     is_super_admin = serializers.BooleanField(source='is_superuser', read_only=True)
     is_moderator = serializers.BooleanField(source='is_staff', read_only=True)
 
@@ -40,3 +40,8 @@ class BanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ban
         fields = '__all__'
+        extra_kwargs = {'banned_by': {'read_only': True}}
+    def create(self, validated_data):
+        request = self.context.get('request')
+        ban = Ban.objects.create(banned_by=request.user, **validated_data)
+        return ban

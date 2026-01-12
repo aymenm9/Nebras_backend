@@ -10,7 +10,7 @@ class Profile(models.Model):
 
 
 class Ban(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='ban')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bans')
     reason = models.TextField(null=True, blank=True)
     banned_start = models.DateTimeField(auto_now_add=True)
     banned_end = models.DateTimeField()

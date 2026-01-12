@@ -27,6 +27,7 @@ class SubSection(models.Model):
         return f"{self.main_section.name} -> {self.name}"
 
 class SecondarySubSection(models.Model):
+    main_section = models.ForeignKey(MainSection, on_delete=models.CASCADE, related_name='secondary_sections')
     sub_section = models.ForeignKey(SubSection, on_delete=models.CASCADE, related_name='secondary_sub_sections')
     name = models.CharField(max_length=255)
     order_index = models.PositiveIntegerField(default=0)
