@@ -4,7 +4,8 @@
 
 ### YouTube Videos (Moderators + Super Admin)
 - `GET /api/content/youtube/`: List YouTube videos created by the user (Super Admins see all).
-  - **Filters**: `metadata__created_by`.
+  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
+  - **Search**: `metadata__title`, `metadata__description`.
 - `POST /api/content/youtube/`: Upload a new YouTube video metadata.
 - `GET /api/content/youtube/<id>/`: Get YouTube video details.
 - `PATCH /api/content/youtube/<id>/`: Update YouTube video.
@@ -12,7 +13,8 @@
 
 ### R2 Files (Moderators + Super Admin)
 - `GET /api/content/files/`: List files created by the user (Super Admins see all).
-  - **Filters**: `created_by`.
+  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
+  - **Search**: `metadata__title`, `metadata__description`.
   - **Note**: This view shows ALL files (completed and incomplete) for management purposes.
 - `POST /api/content/files/upload/`: Initiate a file upload (Returns a presigned PUT URL).
 - `GET /api/content/files/<id>/`: Get file details (Returns a presigned GET URL).
@@ -36,7 +38,7 @@
 ### R2 Files
 - `GET /api/public/files/`: List all public R2 files (Provides presigned GET URLs).
   - **Implicit Filter**: `upload_completed=True`.
-  - **Filters**: `created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
+  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
   - **Search**: `metadata__title`, `metadata__description`.
 - `GET /api/public/files/<id>/`: Get R2 file details.
 ## Super Admin Audit (Admin Panel)

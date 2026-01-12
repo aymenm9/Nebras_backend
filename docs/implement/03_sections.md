@@ -76,3 +76,4 @@ Children of Sub Sections.
     "name": "19th Century"
   }
   ```
+- **Note**: The `main_section` is automatically assigned based on the selected `sub_section`.

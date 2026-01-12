@@ -5,14 +5,25 @@ This document defines the workflows for uploading and managing media content.
 ## Workflow 1: YouTube Content
 Add a strictly linked YouTube video.
 
-### Step 1: Create Entry
+### Step 1: Select Hierarchy
+To maintain consistency, the frontend should follow this filtering flow:
+1.  **Select Main Section**: Fetch from `GET /api/sections/main/`.
+2.  **Filter Sub Sections**: Fetch from `GET /api/sections/sub/?main_section=<main_section_id>`.
+3.  **(Optional) Filter Secondary Sub Sections**: Fetch from `GET /api/sections/secondary/?sub_section=<sub_section_id>`.
+
+> **Note**: Only the `subsection` (mandatory) and `secondary_subsection` (optional) IDs are sent to the backend. The `MainSection` is used only for UI filtering.
+
+### Step 2: Create Entry
 - **Endpoint**: `POST /api/content/youtube/`
 - **Body**:
   ```json
   {
-    "title": "Video Title",
     "video_url": "https://youtube.com/watch?v=...",
-    "metadata": { "subsection": 1 }
+    "metadata": { 
+      "title": "Video Title",
+      "subsection": 5,
+      "secondary_subsection": 10 
+    }
   }
   ```
 
@@ -27,7 +38,14 @@ Upload a file (PDF, Audio, etc.) to Object Storage (R2).
   ```json
   {
     "filename": "book.pdf",
-    "content_type": "application/pdf"
+    "file_type": "application/pdf",
+    "file_size": 10240,
+    "metadata": {
+      "title": "Book Title",
+      "description": "Optional description",
+      "subsection": 5,
+      "secondary_subsection": 10
+    }
   }
   ```
 - **Response**: Returns a `file_url`, `id`, and storage details.
@@ -35,7 +53,15 @@ Upload a file (PDF, Audio, etc.) to Object Storage (R2).
   {
     "id": 105,
     "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
-    "storage_key": "books/105.pdf"
+    "filename": "book.pdf",
+    "file_size": 10240,
+    "file_type": "application/pdf",
+    "metadata": {
+       "id": 201,
+       "title": "Book Title",
+       "content_type": "document",
+       ...
+    }
   }
   ```
 
@@ -59,17 +85,26 @@ Fetch content for end-users (No Auth).
 
 ### Step 1: List Content
 - **Endpoint**: `GET /api/public/metadata/`
-- **Filters**: `?metadata__subsection=<id>`, `?search=<term>`
+- **Filters**: `?subsection=<id>`, `?search=<term>`
 
 ### Step 2: Get Streaming URL
 - **Endpoint**: `GET /api/public/files/<id>/`
-- **Response**: Contains a `file_url` (Presigned GET URL).
+- **Response**: Contains a `file_url` (Presigned GET URL) and metadata.
   ```json
   {
     "id": 105,
-    "title": "My Book",
     "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
-    "mime_type": "application/pdf"
+    "filename": "book.pdf",
+    "file_size": 10240,
+    "file_type": "application/pdf",
+    "metadata": {
+       "id": 201,
+       "title": "Book Title",
+       "description": "...",
+       "content_type": "document",
+       "subsection": 5,
+       "secondary_subsection": 10
+    }
   }
   ```
 - **Action**: Stream/Download directly from that URL.
