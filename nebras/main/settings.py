@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-8d3xm03pyt2i(2xugcgup#q8#0ytl7f75ppieglm^@j!9nw-(7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -189,7 +189,8 @@ AWS_REGION = "auto"
 AWS_S3_SIGNATURE_VERSION = "s3v4"
 AWS_S3_ADDRESSING_STYLE = "virtual"
 AWS_DEFAULT_ACL = None
-AWS_QUERYSTRING_AUTH = False
+AWS_QUERYSTRING_AUTH = True  # Generate signed URLs for private files
+AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire after 1 hour (in seconds)
 
 import redis
 
@@ -215,3 +216,8 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# multipart upload settings
+PART_SIZE = 10 * 1024 * 1024 # 10MB
+
+MULTIPART_THRESHOLD = 50 * 1024 * 1024 # 50MB

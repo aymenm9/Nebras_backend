@@ -4,6 +4,7 @@ from uuid import uuid4
 from .models import R2File
 from typing import Literal
 from botocore.config import Config
+from .models import Metadata, Part, MultipartUpload
 
 def get_s3_client():
     '''
@@ -18,12 +19,12 @@ def get_s3_client():
         config=Config(signature_version='s3v4')
     )
 
-def generate_presigned_url(file: R2File,method: Literal['get', 'put'] = 'get'):
+def generate_presigned_url(file: R2File,method: Literal['get_object', 'put_object','upload_part'] = 'get_object', part_number: int = None, UploadId: str = None):
     '''
         Generate a presigned url for S3
         params:
             file : R2File
-            method : get or put
+            method : get_object or put_object or upload_part
         return:
             presigned url
     '''
@@ -33,11 +34,15 @@ def generate_presigned_url(file: R2File,method: Literal['get', 'put'] = 'get'):
         'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
         'Key': file.file_key,
     }
-    if method == 'put':
+    if method == 'put_object':
         params['ContentType'] = file.file_type
+    if part_number:
+        params['PartNumber'] = part_number
+    if UploadId:
+        params['UploadId'] = UploadId
 
     upload_url = s3.generate_presigned_url(
-        f'{method}_object',
+        ClientMethod=method,
         Params=params,
         ExpiresIn=3600
     )
@@ -50,3 +55,33 @@ def create_file_key(section: str,subsection: str, secondary_subsection: str = No
     directory += f'{secondary_subsection}/' if secondary_subsection else ''
     directory += f'{file_type}/'
     return directory + str(uuid4())
+ 
+def create_multipart_upload(file: R2File):
+    s3 = get_s3_client()
+    response = s3.create_multipart_upload(
+        Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+        Key=file.file_key,
+        ContentType=file.file_type
+    )
+
+    return response['UploadId']
+
+
+def get_parts_list(multipart_upload: MultipartUpload):
+    return [{"PartNumber": p.part_number, "ETag": p.etag} for p in Part.objects.filter(multipart_upload=multipart_upload).order_by('part_number')]
+
+
+
+def complete_multipart_upload(multipart_upload: MultipartUpload):
+    s3 = get_s3_client()
+    s3.complete_multipart_upload(
+        Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+        Key=multipart_upload.r2_file.file_key,
+        MultipartUpload={"Parts": get_parts_list(multipart_upload)},
+        UploadId=multipart_upload.upload_id
+    )
+    multipart_upload.completed = True
+    multipart_upload.save()
+
+def clc_total_parts(file_size: int):
+    return file_size // settings.PART_SIZE + 1

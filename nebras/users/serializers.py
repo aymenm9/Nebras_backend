@@ -8,27 +8,29 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['profile_image']
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
+    user_profile = ProfileSerializer(source='profile')
     is_super_admin = serializers.BooleanField(source='is_superuser', read_only=True)
     is_moderator = serializers.BooleanField(source='is_staff', read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'profile', 'is_super_admin', 'is_moderator','first_name','last_name']
+        fields = ['id', 'username', 'email', 'user_profile', 'is_super_admin', 'is_moderator','first_name','last_name']
         extra_kwargs = {'password': {'write_only': True}, 'is_staff': {'read_only': True},
         'is_superuser': {'read_only': True}}
 
+
+
 class ModeratorSerializer(serializers.ModelSerializer):
-    
+    user_profile = ProfileSerializer(source='profile')
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password','first_name','last_name']
+        fields = ['id', 'username', 'email', 'password','first_name','last_name','user_profile']
         extra_kwargs = {'password': {'write_only': True}}
     def create(self, validated_data):
-        # Default staff status to True for moderators
-        password = validated_data.pop('password')
-        user = User.objects.create(**validated_data, is_staff=True)
-        user.set_password(password)
+        profile_data = validated_data.pop('user_profile')
+        user = User.objects.create(**validated_data)
+        profile = Profile.objects.create(user=user, **profile_data)
+        user.set_password(validated_data['password'])
         user.save()
         return user
 
