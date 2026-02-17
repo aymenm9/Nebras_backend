@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'admin_apis',
     'public_apis',
     'chat',
-
+    'notifications',
+    
     "channels",
     "channels_redis",
 ]
@@ -149,6 +150,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ],
+
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
@@ -158,6 +160,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Nebras API description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
     
 }
 
@@ -221,3 +224,5 @@ CHANNEL_LAYERS = {
 PART_SIZE = 10 * 1024 * 1024 # 10MB
 
 MULTIPART_THRESHOLD = 50 * 1024 * 1024 # 50MB
+
+

@@ -13,5 +13,5 @@ class YoutubeVideoAdmin(admin.ModelAdmin):
 
 @admin.register(R2File)
 class R2FileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'metadata', 'file_type', 'file_size', 'upload_completed')
-    list_filter = ('upload_completed', 'file_type')
+    list_display = ('id', 'metadata', 'file_type', 'file_size', 'upload_status')
+    list_filter = ('upload_status', 'file_type')

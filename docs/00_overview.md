@@ -168,23 +168,11 @@ Validation rules enforced in backend, not UI.
 
 ## 5.3 Content (Metadata Only)
 
-```
-Content
-- id
-- type (BOOK | AUDIO | VIDEO)
-- category_id
-- title
-- description
-- duration_seconds (nullable)
-- storage_key
-- file_size
-- mime_type
-- status (UPLOADING | READY)
-- created_by
-- created_at
-```
-
-No binary data in DB.
+**Models**:
+- **Metadata**: Base info (title, description, parent section).
+- **YoutubeVideo**: Links to external videos.
+- **R2File**: Stores file details (size, type, status) and handles upload logic.
+- **MultipartUpload**: Tracks chunked uploads for large files.
 
 ---
 
@@ -196,88 +184,71 @@ No binary data in DB.
 - **Buckets**: Private.
 
 ### Storage Strategy (Hybrid)
-1. **Small Files (e.g., Profile Pictures)**:
-   - **Mechanism**: Direct upload through Django.
-   - **Storage**: `django-storages` pointing to R2.
-   - No frontend signing needed.
-
-2. **Large Files (Media > 10MB)**:
-   - **Mechanism**: Signed URLs (Presigned PUT/POST).
-   - **Flow**: Frontend requests URL -> Backend authorizes & signs -> Frontend uploads to R2.
+1. **Profile Images / Thumbnails**:
+   - **Mechanism**: Direct upload via Django Serializers.
+   - **Storage**: `django-storages` (boto3) backend.
+   
+2. **Content Files (Videos/Docs/Audio)**:
+   - **Mechanism**: Unified Upload Strategy.
+   - **Small Files (< 5MB)**: Single PUT presigned URL.
+   - **Large Files (> 5MB)**: Multipart Chunked Upload (10MB parts).
+   - **Flow**: Init -> Get URL(s) -> Client Uploads -> Complete.
 
 Structure:
 ```
-books/{content_id}.pdf
-audio/{content_id}.mp3
-video/{content_id}.mp4
+<Section>/<SubSection>/<Type>/{uuid}
 ```
-
-Files are immutable.
-
----
-
-## 6.2 Access Control
-
-- Only backend (or signed URLs) can write to R2.
-- Clients access media only via signed URLs.
-
-Security is policy-based (IAM), not code-based.
 
 ---
 
 # 7. Upload Flow (Core Backend Logic)
 
-## 7.1 Upload Initialization
+## 7.1 Initialization & URL Generation
 
 Client → Backend:
 ```
-POST /uploads/init
-- file_name
-- file_size
-- mime_type
-- content_type
-- category_id
+POST /api/content/files/
+{ file_size, file_type, metadata: {...} }
 ```
 
 Backend:
-- Auth + role check
-- Create Content row (status = UPLOADING)
-- Decide storage_key
-- Generate signed PUT URL
-
-Backend → Client:
-```
-{ upload_url, content_id }
-```
-
----
-
-## 7.2 Direct Upload
-
-Client → S3:
-```
-PUT signed_upload_url
-(binary file)
-```
-
-Properties:
-- URL bound to single object
-- Method restricted (PUT)
-- Short TTL
-
----
-
-## 7.3 Upload Completion
+- Creates `R2File` record.
+- Determines `upload_type` ("single" vs "multipart").
+- If multipart, initializes S3 multipart upload.
 
 Client → Backend:
 ```
-POST /uploads/complete
-{ content_id }
+POST /api/content/files/<id>/upload-url/
 ```
 
 Backend:
-- Optional HEAD object check
-- Mark content as READY
+- Returns Presigned URL (for whole file or specific part).
+
+## 7.2 Client Upload
+
+Client → S3 (Directly):
+- PUTs binary data to the provided Presigned URL.
+- For Multipart: Uploads chunks sequentially.
+
+## 7.3 Part Registration (Multipart Only)
+
+Client → Backend:
+```
+POST /api/content/parts/
+{ multipart_upload_id, part_number, etag }
+```
+
+## 7.4 Completion
+
+Client → Backend:
+```
+POST /api/content/files/<id>/complete/
+```
+
+Backend:
+- Verifies all parts (if multipart) or file existence.
+- Marks status as `completed`.
+- File becomes available via Public APIs.
 
 ---
 
@@ -285,17 +256,16 @@ Backend:
 
 Client → Backend:
 ```
-GET /stream/{content_id}
+GET /api/public/files/{id}/
 ```
 
 Backend:
-- Public Access (No Auth) OR Staff Permission check
-- Generate signed GET URL (short TTL)
+- Checks if file is `completed`.
+- Generates signed GET URL (short TTL).
+- Returns URL + Metadata.
 
 Client:
-- Streams directly from S3/CDN
-
-Backend never streams media.
+- Streams directly from R2/CDN.
 
 ---
 

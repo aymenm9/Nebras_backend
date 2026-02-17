@@ -1596,6 +1596,16 @@ paths:
         description: A search term.
         schema:
           type: string
+      - in: query
+        name: upload_type
+        schema:
+          type: string
+          enum:
+          - multipart
+          - single
+        description: |-
+          * `single` - Single
+          * `multipart` - Multipart
       tags:
       - content
       security:
@@ -1606,6 +1616,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedR2FileList'
+          description: ''
+    post:
+      operationId: content_files_create
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/R2File'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/R2File'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
           description: ''
   /api/content/files/{id}/:
     get:
@@ -1703,22 +1738,100 @@ paths:
       responses:
         '204':
           description: No response body
-  /api/content/files/upload/:
+  /api/content/files/{id}/complete/:
     post:
-      operationId: content_files_upload_create
+      operationId: content_files_complete_create
+      description: Complete the multipart upload
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/R2File'
+          description: ''
+        '404':
+          description: No response body
+        '403':
+          description: No response body
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /api/content/files/{id}/upload-url/:
+    post:
+      operationId: content_files_upload_url_create
+      description: Get the presigned upload URL for either multipart or simple uploads.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadURLResponse'
+          description: ''
+        '404':
+          description: No response body
+        '403':
+          description: No response body
+  /api/content/multipart/{id}/:
+    get:
+      operationId: content_multipart_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipartUpload'
+          description: ''
+  /api/content/parts/:
+    post:
+      operationId: content_parts_create
       tags:
       - content
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/R2FileSerializerUpload'
+              $ref: '#/components/schemas/Part'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/R2FileSerializerUpload'
+              $ref: '#/components/schemas/Part'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/R2FileSerializerUpload'
+              $ref: '#/components/schemas/Part'
         required: true
       security:
       - jwtAuth: []
@@ -1727,8 +1840,104 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/R2FileSerializerUpload'
+                $ref: '#/components/schemas/Part'
           description: ''
+  /api/content/parts/{id}/:
+    get:
+      operationId: content_parts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+          description: ''
+    put:
+      operationId: content_parts_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Part'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Part'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Part'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+          description: ''
+    patch:
+      operationId: content_parts_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPart'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPart'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPart'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Part'
+          description: ''
+    delete:
+      operationId: content_parts_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - content
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/content/youtube/:
     get:
       operationId: content_youtube_list
@@ -2817,12 +3026,28 @@ paths:
       description: Login with username or email.
       tags:
       - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
       security:
       - jwtAuth: []
       - {}
       responses:
         '200':
-          description: No response body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
   /api/users/me/:
     get:
       operationId: users_me_retrieve
@@ -2889,6 +3114,7 @@ components:
           type: integer
         banned_by:
           type: integer
+          readOnly: true
       required:
       - banned_by
       - banned_end
@@ -2942,6 +3168,17 @@ components:
         * `audio` - Audio
         * `document` - Document
         * `youtube` - Youtube
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
     MainSection:
       type: object
       properties:
@@ -3057,10 +3294,50 @@ components:
         last_name:
           type: string
           maxLength: 150
+        user_profile:
+          $ref: '#/components/schemas/Profile'
       required:
       - id
       - password
+      - user_profile
       - username
+    MultipartUpload:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        total_parts:
+          type: integer
+          readOnly: true
+        uploaded_parts:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - total_parts
+      - updated_at
+      - uploaded_parts
+    MultipartUploadResponse:
+      type: object
+      properties:
+        presigned_url:
+          type: string
+          format: uri
+        next_part_number:
+          type: integer
+      required:
+      - next_part_number
+      - presigned_url
     PaginatedBanList:
       type: object
       required:
@@ -3291,6 +3568,39 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/YoutubeVideo'
+    Part:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        multipart_upload:
+          type: integer
+        part_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        etag:
+          type: string
+          nullable: true
+          maxLength: 100
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - multipart_upload
+      - part_number
+      - updated_at
     PatchedBan:
       type: object
       properties:
@@ -3313,6 +3623,7 @@ components:
           type: integer
         banned_by:
           type: integer
+          readOnly: true
     PatchedChatMessage:
       type: object
       properties:
@@ -3404,20 +3715,46 @@ components:
         last_name:
           type: string
           maxLength: 150
+        user_profile:
+          $ref: '#/components/schemas/Profile'
+    PatchedPart:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        multipart_upload:
+          type: integer
+        part_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        etag:
+          type: string
+          nullable: true
+          maxLength: 100
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     PatchedR2File:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        metadata_info:
-          $ref: '#/components/schemas/Metadata'
         file_url:
           type: string
           readOnly: true
-        file_key:
-          type: string
-          readOnly: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'
         filename:
           type: string
           nullable: true
@@ -3427,15 +3764,21 @@ components:
           maximum: 9223372036854775807
           minimum: -9223372036854775808
           format: int64
-          nullable: true
         file_type:
           type: string
-          nullable: true
           maxLength: 100
-        upload_completed:
-          type: boolean
-        metadata:
-          type: integer
+        upload_status:
+          allOf:
+          - $ref: '#/components/schemas/UploadStatusEnum'
+          readOnly: true
+        upload_type:
+          allOf:
+          - $ref: '#/components/schemas/UploadTypeEnum'
+          readOnly: true
+        multipart_uploader:
+          allOf:
+          - $ref: '#/components/schemas/MultipartUpload'
+          readOnly: true
     PatchedSecondarySubSection:
       type: object
       properties:
@@ -3459,6 +3802,9 @@ components:
         created_by:
           type: integer
           nullable: true
+        main_section:
+          type: integer
+          readOnly: true
     PatchedSubSection:
       type: object
       properties:
@@ -3491,7 +3837,7 @@ components:
         video_url:
           type: string
           maxLength: 512
-        metadata_info:
+        metadata:
           $ref: '#/components/schemas/Metadata'
     Profile:
       type: object
@@ -3499,21 +3845,17 @@ components:
         profile_image:
           type: string
           format: uri
-          nullable: true
     R2File:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
-        metadata_info:
-          $ref: '#/components/schemas/Metadata'
         file_url:
           type: string
           readOnly: true
-        file_key:
-          type: string
-          readOnly: true
+        metadata:
+          $ref: '#/components/schemas/Metadata'
         filename:
           type: string
           nullable: true
@@ -3523,59 +3865,30 @@ components:
           maximum: 9223372036854775807
           minimum: -9223372036854775808
           format: int64
-          nullable: true
         file_type:
           type: string
-          nullable: true
           maxLength: 100
-        upload_completed:
-          type: boolean
-        metadata:
-          type: integer
+        upload_status:
+          allOf:
+          - $ref: '#/components/schemas/UploadStatusEnum'
+          readOnly: true
+        upload_type:
+          allOf:
+          - $ref: '#/components/schemas/UploadTypeEnum'
+          readOnly: true
+        multipart_uploader:
+          allOf:
+          - $ref: '#/components/schemas/MultipartUpload'
+          readOnly: true
       required:
-      - file_key
+      - file_size
+      - file_type
       - file_url
       - id
       - metadata
-      - metadata_info
-    R2FileSerializerUpload:
-      type: object
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        metadata_info:
-          $ref: '#/components/schemas/Metadata'
-        file_url:
-          type: string
-          readOnly: true
-        file_key:
-          type: string
-          readOnly: true
-        filename:
-          type: string
-          nullable: true
-          maxLength: 512
-        file_size:
-          type: integer
-          maximum: 9223372036854775807
-          minimum: -9223372036854775808
-          format: int64
-          nullable: true
-        file_type:
-          type: string
-          nullable: true
-          maxLength: 100
-        upload_completed:
-          type: boolean
-        metadata:
-          type: integer
-      required:
-      - file_key
-      - file_url
-      - id
-      - metadata
-      - metadata_info
+      - multipart_uploader
+      - upload_status
+      - upload_type
     SecondarySubSection:
       type: object
       properties:
@@ -3599,11 +3912,23 @@ components:
         created_by:
           type: integer
           nullable: true
+        main_section:
+          type: integer
+          readOnly: true
       required:
       - created_at
       - id
+      - main_section
       - name
       - sub_section
+    SimpleUploadResponse:
+      type: object
+      properties:
+        presigned_url:
+          type: string
+          format: uri
+      required:
+      - presigned_url
     SubSection:
       type: object
       properties:
@@ -3644,6 +3969,33 @@ components:
       required:
       - access
       - refresh
+    UploadStatusEnum:
+      enum:
+      - pending
+      - completed
+      - failed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `completed` - Completed
+        * `failed` - Failed
+    UploadTypeEnum:
+      enum:
+      - single
+      - multipart
+      type: string
+      description: |-
+        * `single` - Single
+        * `multipart` - Multipart
+    UploadURLResponse:
+      oneOf:
+      - $ref: '#/components/schemas/MultipartUploadResponse'
+      - $ref: '#/components/schemas/SimpleUploadResponse'
+      discriminator:
+        propertyName: upload_type
+        mapping:
+          multipart: '#/components/schemas/MultipartUploadResponse'
+          simple: '#/components/schemas/SimpleUploadResponse'
     User:
       type: object
       properties:
@@ -3661,10 +4013,8 @@ components:
           format: email
           title: Email address
           maxLength: 254
-        profile:
-          allOf:
-          - $ref: '#/components/schemas/Profile'
-          readOnly: true
+        user_profile:
+          $ref: '#/components/schemas/Profile'
         is_super_admin:
           type: boolean
           readOnly: true
@@ -3681,7 +4031,7 @@ components:
       - id
       - is_moderator
       - is_super_admin
-      - profile
+      - user_profile
       - username
     YoutubeVideo:
       type: object
@@ -3692,11 +4042,11 @@ components:
         video_url:
           type: string
           maxLength: 512
-        metadata_info:
+        metadata:
           $ref: '#/components/schemas/Metadata'
       required:
       - id
-      - metadata_info
+      - metadata
       - video_url
   securitySchemes:
     jwtAuth:

@@ -14,6 +14,7 @@ from content.serializers import YoutubeVideoSerializer, R2FileSerializer
 from chat.models import ChatMessage, MessageFile
 from chat.serializers import ChatMessageSerializer, MessageFileSerializer
 
+
 # Moderator Management (Moderators are super admin only)
 class AdminModeratorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)
@@ -21,6 +22,7 @@ class AdminModeratorListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     filterset_fields = ['is_staff', 'is_superuser', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
+    
 
 class AdminModeratorRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)

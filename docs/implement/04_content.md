@@ -1,82 +1,93 @@
 # Content Management Guide
 
-This document defines the workflows for uploading and managing media content.
+This document defines the workflows for managing content (YouTube Videos & File Uploads).
 
-## Workflow 1: YouTube Content
-Add a strictly linked YouTube video.
+## Workflow 1: YouTube Videos
+embed existing YouTube videos.
 
-### Step 1: Select Hierarchy
-To maintain consistency, the frontend should follow this filtering flow:
-1.  **Select Main Section**: Fetch from `GET /api/sections/main/`.
-2.  **Filter Sub Sections**: Fetch from `GET /api/sections/sub/?main_section=<main_section_id>`.
-3.  **(Optional) Filter Secondary Sub Sections**: Fetch from `GET /api/sections/secondary/?sub_section=<sub_section_id>`.
-
-> **Note**: Only the `subsection` (mandatory) and `secondary_subsection` (optional) IDs are sent to the backend. The `MainSection` is used only for UI filtering.
-
-### Step 2: Create Entry
+### Step 1: Create
 - **Endpoint**: `POST /api/content/youtube/`
 - **Body**:
   ```json
   {
     "video_url": "https://youtube.com/watch?v=...",
-    "metadata": { 
-      "title": "Video Title",
+    "metadata": {
+      "title": "Intro to Python",
+      "description": "...",
       "subsection": 5,
-      "secondary_subsection": 10 
-    }
+      "secondary_subsection": 10,
+      "content_type": "youtube"
+    },
+    "thumbnail": "(file)"
   }
   ```
 
 ---
 
-## Workflow 2: File Upload (Presigned URL)
-Upload a file (PDF, Audio, etc.) to Object Storage (R2).
+## Workflow 2: File Uploads (R2/S3)
+Unified workflow for videos, audio, and documents. The backend automatically determines if a file should be uploaded as a single file or in multipart chunks based on size (> 5MB).
 
-### Step 1: Initialize Upload
-- **Endpoint**: `POST /api/content/files/upload/`
+### Step 1: Initiate Upload
+Create the file metadata and get the upload strategy.
+
+- **Endpoint**: `POST /api/content/files/`
 - **Body**:
   ```json
   {
-    "filename": "book.pdf",
-    "file_type": "application/pdf",
-    "file_size": 10240,
+    "file_size": 10485760,  // Size in bytes
+    "file_type": "video/mp4",
+    "filename": "lecture.mp4",
     "metadata": {
-      "title": "Book Title",
-      "description": "Optional description",
-      "subsection": 5,
-      "secondary_subsection": 10
-    }
+      "title": "Lecture 1",
+      "description": "...",
+      "subsection": 5
+    },
+     "thumbnail": "(file)" // optional
   }
   ```
-- **Response**: Returns a `file_url`, `id`, and storage details.
+- **Response**:
   ```json
   {
     "id": 105,
-    "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
-    "filename": "book.pdf",
-    "file_size": 10240,
-    "file_type": "application/pdf",
-    "metadata": {
-       "id": 201,
-       "title": "Book Title",
-       "content_type": "document",
-       ...
-    }
+    "upload_type": "multipart",  // or "single"
+    "multipart_uploader": { "id": 12, "total_parts": 2, ... }
   }
   ```
 
-### Step 2: Upload to R2 (Client-Side)
-- **Action**: Perform a `PUT` request to the `file_url` received in Step 1.
-- **Body**: The raw file binary.
-- **Headers**: `Content-Type: application/pdf`
+### Step 2: Get Upload URL
+Get the presigned URL for the file (if single) or the specific part (if multipart).
 
-### Step 3: Confirm Completion
-- **Endpoint**: `PATCH /api/content/files/<id>/`
+- **Endpoint**: `POST /api/content/files/<id>/upload-url/`
+- **Response (Single)**: `{ "presigned_url": "..." }`
+- **Response (Multipart)**: `{ "presigned_url": "...", "next_part_number": 1 }`
+
+### Step 3: Upload to Cloud (Client-Side)
+Perform a `PUT` request to the `presigned_url` with the file raw binary data.
+- **Header**: Ensure `Content-Type` matches `file_type`.
+- **Action**: 
+  - If **Single**: Upload entire file.
+  - If **Multipart**: Upload the specific chunk (10MB default).
+- **Result**: Capture the `ETag` header from the response (for multipart).
+
+### Step 4: Register Part (Multipart Only)
+Notify the backend that a part has been uploaded.
+
+- **Endpoint**: `POST /api/content/parts/`
 - **Body**:
   ```json
-  { "upload_completed": true }
+  {
+    "multipart_upload": 12,  // ID from Step 1 response
+    "part_number": 1,        // Number from Step 2 response
+    "etag": "\"a1b2c3...\""  // From Step 3 response headers
+  }
   ```
-- **Result**: The file is now visible in the Public API.
+- **Loop**: Repeat Steps 2-4 for all parts until `uploaded_parts` == `total_parts`.
+
+### Step 5: Complete Upload
+Finalize the upload. Required for **both** Single and Multipart flows.
+
+- **Endpoint**: `POST /api/content/files/<id>/complete/`
+- **Response**: R2File object with `upload_status: "completed"`.
 
 ---
 
@@ -87,24 +98,6 @@ Fetch content for end-users (No Auth).
 - **Endpoint**: `GET /api/public/metadata/`
 - **Filters**: `?subsection=<id>`, `?search=<term>`
 
-### Step 2: Get Streaming URL
-- **Endpoint**: `GET /api/public/files/<id>/`
-- **Response**: Contains a `file_url` (Presigned GET URL) and metadata.
-  ```json
-  {
-    "id": 105,
-    "file_url": "https://<r2_bucket>.../book.pdf?X-Amz-Signature=...",
-    "filename": "book.pdf",
-    "file_size": 10240,
-    "file_type": "application/pdf",
-    "metadata": {
-       "id": 201,
-       "title": "Book Title",
-       "description": "...",
-       "content_type": "document",
-       "subsection": 5,
-       "secondary_subsection": 10
-    }
-  }
-  ```
-- **Action**: Stream/Download directly from that URL.
+### Step 2: Get Content Details
+- **Youtube**: `GET /api/public/youtube/<id>/` → Returns `video_url`.
+- **Files**: `GET /api/public/files/<id>/` → Returns `file_url` (Signed GET URL) and metadata.

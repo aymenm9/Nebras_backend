@@ -4,7 +4,7 @@ from .models import MainSection, SubSection, SecondarySubSection
 class MainSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MainSection
-        fields = ['id', 'name', 'order_index', 'created_at', 'created_by']
+        fields = ['id', 'name', 'order_index', 'created_at', 'created_by', 'thumbnail']
         read_only_fields = ['created_at']
 
     def create(self, validated_data):
@@ -14,7 +14,7 @@ class MainSectionSerializer(serializers.ModelSerializer):
 class SubSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubSection
-        fields = ['id', 'main_section', 'name', 'order_index', 'created_at', 'created_by']
+        fields = ['id', 'main_section', 'name', 'order_index', 'created_at', 'created_by', 'thumbnail']
         read_only_fields = ['created_at']
 
     def create(self, validated_data):
@@ -30,7 +30,7 @@ class SubSectionSerializer(serializers.ModelSerializer):
 class SecondarySubSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = SecondarySubSection
-        fields = ['id', 'sub_section', 'name', 'order_index', 'created_at', 'created_by', 'main_section']
+        fields = ['id', 'sub_section', 'name', 'order_index', 'created_at', 'created_by', 'main_section', 'thumbnail']
         read_only_fields = ['created_at', 'main_section']
 
     def create(self, validated_data):

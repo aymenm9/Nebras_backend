@@ -13,8 +13,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         user = self.scope["user"]
         
-        if not user.is_authenticated:
+        if not user.is_authenticated or not user.is_staff:
             await self.close()
+            return
+
+        if await self.check_is_banned(user):
+            await self.close()
+            return
+
+
        
         self.room_group_name = "global_chat"
         
@@ -136,3 +143,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 } for f in files
             ]
         }
+
+    @database_sync_to_async
+    def check_is_banned(self, user):
+        from users.models import Ban
+        from django.utils import timezone
+        return Ban.objects.filter(user=user, is_banned=True, banned_end__gt=timezone.now()).exists()

@@ -1,48 +1,41 @@
-# 05 Content Management
+# Content Module
 
-## Endpoints
+## Overview
+The Content module manages educational resources such as videos, audio files, and documents. These resources are organized hierarchically under Sections -> Sub-Sections -> Secondary Sub-Sections.
 
-### YouTube Videos (Moderators + Super Admin)
-- `GET /api/content/youtube/`: List YouTube videos created by the user (Super Admins see all).
-  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
-  - **Search**: `metadata__title`, `metadata__description`.
-- `POST /api/content/youtube/`: Upload a new YouTube video metadata.
-- `GET /api/content/youtube/<id>/`: Get YouTube video details.
-- `PATCH /api/content/youtube/<id>/`: Update YouTube video.
-- `DELETE /api/content/youtube/<id>/`: Delete YouTube video.
+## Content Types
+1.  **YouTube Videos**: Embedded links to external YouTube content.
+2.  **R2 Files**: Direct uploads (Video, Audio, Document) stored in Cloudflare R2 / AWS S3 compatible storage.
 
-### R2 Files (Moderators + Super Admin)
-- `GET /api/content/files/`: List files created by the user (Super Admins see all).
-  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
-  - **Search**: `metadata__title`, `metadata__description`.
-  - **Note**: This view shows ALL files (completed and incomplete) for management purposes.
-- `POST /api/content/files/upload/`: Initiate a file upload (Returns a presigned PUT URL).
-- `GET /api/content/files/<id>/`: Get file details (Returns a presigned GET URL).
-- `PATCH /api/content/files/<id>/`: Update file metadata.
-- `DELETE /api/content/files/<id>/`: Delete file.
+## Key Features
+-   **Hierarchical Organization**: Content is strictly categorized.
+-   **Unified Upload Strategy**: Automatically switches between single-file and multipart uploads based on file size (Threshold: 5MB).
+-   **Multipart Uploads**: Large files are broken into 10MB chunks for reliability and performance.
+-   **Presigned URLs**: Secure, direct-to-cloud uploads without burdening the application server.
+-   **Public Access**: Read-only APIs for unauthenticated users to consume content.
 
-## Public Endpoints (No Auth Required)
-
-### YouTube Videos
-- `GET /api/public/youtube/`: List all public YouTube videos.
-  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
-  - **Search**: `metadata__title`, `metadata__description`.
-- `GET /api/public/youtube/<id>/`: Get YouTube video details.
-
+## Models
 ### Metadata
-- `GET /api/public/metadata/`: List all content metadata.
-  - **Filters**: `created_by`, `subsection`, `subsection__main_section`, `secondary_subsection`, `content_type`.
-  - **Search**: `title`, `description`.
-- `GET /api/public/metadata/<id>/`: Get metadata details.
+The core model linking content to the section hierarchy.
+-   `title`, `description`, `thumbnail`
+-   `subsection`, `secondary_subsection`
+-   `content_type`: video, audio, document, youtube
+-   `created_by`: User (Moderator/Admin)
 
-### R2 Files
-- `GET /api/public/files/`: List all public R2 files (Provides presigned GET URLs).
-  - **Implicit Filter**: `upload_completed=True`.
-  - **Filters**: `metadata__created_by`, `metadata__subsection`, `metadata__subsection__main_section`, `metadata__secondary_subsection`, `metadata__content_type`.
-  - **Search**: `metadata__title`, `metadata__description`.
-- `GET /api/public/files/<id>/`: Get R2 file details.
-## Super Admin Audit (Admin Panel)
-Separate endpoints for Super Admins to oversee all content items at once.
-- `GET /api/admin/content/youtube/`: View list of all YouTube content.
-- `GET /api/admin/content/files/`: View list of all file content.
-- `GET/PATCH/DELETE /api/admin/content/<type>/<id>/`: Directly manage any content item.
+### YoutubeVideo
+Extension of Metadata for YouTube links.
+-   `video_url`: URL string.
+
+### R2File
+Extension of Metadata for stored files.
+-   `file_key`: Storage path.
+-   `file_size`, `file_type`.
+-   `upload_status`: pending, completed, failed.
+-   `upload_type`: single, multipart.
+
+### MultipartUpload & Part
+Tracks the state of large file uploads.
+-   `upload_id`: S3 upload identifier.
+-   `total_parts`: Calculated number of chunks.
+-   `uploaded_parts`: Counter for progress tracking.
+-   `parts`: Individual chunk records with ETags.
