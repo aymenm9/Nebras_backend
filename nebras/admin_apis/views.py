@@ -20,7 +20,7 @@ class AdminModeratorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)
     serializer_class = ModeratorSerializer
     permission_classes = [IsAuthenticated, IsSuperAdmin]
-    filterset_fields = ['is_staff', 'is_superuser', 'is_active']
+    filterset_fields = ['is_staff', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     
 

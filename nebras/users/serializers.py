@@ -32,7 +32,7 @@ class ModeratorSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(required=False)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password','first_name','last_name','profile_image']
+        fields = ['id', 'username', 'email', 'password','first_name','last_name','profile_image','is_active']
         extra_kwargs = {'password': {'write_only': True}}
     def create(self, validated_data):
         profile_image = validated_data.pop('profile_image', None)
