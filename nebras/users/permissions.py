@@ -14,7 +14,15 @@ class IsModerator(permissions.BasePermission):
     """
     def has_permission(self, request, view):
         user = request.user
-        if not user :
+        if not user:
             return False
-        is_banned = Ban.objects.filter(user=user, is_banned=True, banned_end__gt=timezone.now()).exists()
-        return bool(not is_banned and request.user.is_staff)
+
+        active_ban = Ban.objects.filter(user=user, is_banned=True).order_by('-banned_end').first()
+        if active_ban:
+            if active_ban.banned_end <= timezone.now():
+                active_ban.is_banned = False
+                active_ban.save(update_fields=['is_banned'])
+            else:
+                return False
+
+        return bool(request.user.is_staff)

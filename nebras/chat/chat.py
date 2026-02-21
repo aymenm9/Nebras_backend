@@ -91,20 +91,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Load recent messages from database"""
         from chat.models import ChatMessage as Message
         
-        messages = Message.objects.select_related('sender').prefetch_related('files').order_by('-timestamp')[:limit]
+        messages = Message.objects.select_related('user').prefetch_related('files').order_by('-created_at')[:limit]
         
         return [
             {
                 'id': msg.id,
-                'message': msg.content,
-                'username': msg.sender.username,
-                'timestamp': msg.timestamp.isoformat(),
+                'message': msg.message,
+                'username': msg.user.username,
+                'timestamp': msg.created_at.isoformat(),
                 'files': [
                     {
                         'id': f.id,
                         'url': f.file.url,
-                        'type': f.file_type,
-                        'size': f.file_size
                     } for f in msg.files.all()
                 ]
             }
@@ -118,28 +116,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
         from chat.models import ChatMessage as Message, MessageFile
         
         msg = Message.objects.create(
-            sender=user,
-            content=content
+            user=user,
+            message=content
         )
         
         if file_ids:
             for file_id in file_ids:
-                file = MessageFile.objects.filter(id=file_id)
-                if file :
-                    if file.user.id == user.id:
-                        file.update(message=msg)
+                file = MessageFile.objects.filter(id=file_id).first()
+                if file and file.user_id == user.id:
+                    file.message = msg
+                    file.save(update_fields=['message'])
                 
         
         files = MessageFile.objects.filter(message=msg)
         return {
             'id': msg.id,
-            'timestamp': msg.timestamp.isoformat(),
+            'timestamp': msg.created_at.isoformat(),
             'files': [
                 {
                     'id': f.id,
                     'url': f.file.url,
-                    'type': f.file_type,
-                    'size': f.file_size
                 } for f in files
             ]
         }
@@ -148,4 +144,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def check_is_banned(self, user):
         from users.models import Ban
         from django.utils import timezone
-        return Ban.objects.filter(user=user, is_banned=True, banned_end__gt=timezone.now()).exists()
+
+        active_ban = Ban.objects.filter(user=user, is_banned=True).order_by('-banned_end').first()
+        if not active_ban:
+            return False
+
+        if active_ban.banned_end <= timezone.now():
+            active_ban.is_banned = False
+            active_ban.save(update_fields=['is_banned'])
+            return False
+
+        return True

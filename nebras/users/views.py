@@ -10,7 +10,7 @@ from drf_spectacular.utils import extend_schema
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
-from .serializers import LoginSerializer, UserSerializer
+from .serializers import LoginSerializer, UserSerializer, PasswordChangeSerializer, ModeratorSerializer
 from .permissions import IsModerator
 
 class LoginView(APIView):
@@ -57,4 +57,43 @@ class MeView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+class EditProfileView(generics.UpdateAPIView):
+    """
+    Edit current user profile.
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsModerator]
+
+    def get_object(self):
+        return self.request.user
+    
+class PasswordChangeView(APIView):
+    """
+    Change current user password.
+    """
+    permission_classes = [IsAuthenticated, IsModerator]
+
+    class PasswordChangeSerializer(serializers.Serializer):
+        old_password = serializers.CharField()
+        new_password = serializers.CharField()
+
+    @extend_schema(
+        request=PasswordChangeSerializer,
+        responses={200: 'Password changed successfully'}
+    )
+    def post(self, request):
+        serializer = self.PasswordChangeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        old_password = serializer.validated_data['old_password']
+        new_password = serializer.validated_data['new_password']
+
+        if not user.check_password(old_password):
+            return Response({'error': 'Old password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password changed successfully'})
 

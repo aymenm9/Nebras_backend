@@ -37,7 +37,8 @@ def generate_presigned_url(file: R2File,method: Literal['get_object', 'put_objec
     if method == 'put_object':
         params['ContentType'] = file.file_type
         params['ContentLength'] = file.file_size
-        params['Metadata'] = {'user-id': str(file.metadata.created_by.id), 'file-id': str(file.id), 'upload-type': file.upload_type}
+        # if Metadata included will need to send it to the front to include it also 
+        # params['Metadata'] = {'user-id': str(file.metadata.created_by.id), 'file-id': str(file.id), 'upload-type': file.upload_type}
     
     upload_url = s3.generate_presigned_url(
         ClientMethod=method,
@@ -62,7 +63,7 @@ def generate_presigned_url_for_part(file: R2File, part_number: int , UploadId: s
         'Key': file.file_key,
         'PartNumber': part_number,
         'UploadId': UploadId if UploadId else file.multipart_uploader.upload_id, # in case i need it for something else
-        'ContentLength' : settings.PART_SIZE
+        #'ContentLength' : settings.PART_SIZE # the page length can break the last part & it dont matter mach cause the n of part is calculated based on the file size and the part size so the last part will be smaller than the part size if the file size is not a multiple of the part size
     }
 
     upload_url = s3.generate_presigned_url(

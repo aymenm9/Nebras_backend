@@ -202,11 +202,11 @@ AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire after 1 hour (in seconds)
 import redis
 
 r = redis.Redis(
-    host='redis-17665.crce198.eu-central-1-3.ec2.cloud.redislabs.com',
-    port=17665,
+    host='redis-10148.crce202.eu-west-3-1.ec2.cloud.redislabs.com',
+    port=10148,
     decode_responses=True,
     username="default",
-    password="ceXylQ2IrWShhbX24uJ3aqdZGhpkZbWL",
+    password="7kEuOCkHvehbkIISUvTVZClzgM58zHsl",
 )
 
 
@@ -218,11 +218,13 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [("redis-17665.crce198.eu-central-1-3.ec2.cloud.redislabs.com", 17665)],
-            # Example: ("redis-12345.cloud.redislabs.com", 16379)
+            "hosts": [
+                "redis://default:7kEuOCkHvehbkIISUvTVZClzgM58zHsl@redis-10148.crce202.eu-west-3-1.ec2.cloud.redislabs.com:10148"
+            ],
         },
     },
 }
+
 
 # multipart upload settings
 PART_SIZE = 10 * 1024 * 1024 # 10MB
