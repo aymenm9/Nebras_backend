@@ -10,13 +10,16 @@ from drf_spectacular.utils import extend_schema
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
+from rest_framework.throttling import ScopedRateThrottle
 from .serializers import LoginSerializer, UserSerializer, PasswordChangeSerializer, ModeratorSerializer
 from .permissions import IsModerator
+from .throttles import UserLoginRateThrottle
 
 class LoginView(APIView):
     """
     Login with username or email.
     """
+    throttle_classes = [UserLoginRateThrottle]
     @extend_schema(
         request=LoginSerializer,
         responses={200: UserSerializer}
@@ -73,6 +76,8 @@ class PasswordChangeView(APIView):
     Change current user password.
     """
     permission_classes = [IsAuthenticated, IsModerator]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'password_change'
 
     class PasswordChangeSerializer(serializers.Serializer):
         old_password = serializers.CharField()

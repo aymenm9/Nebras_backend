@@ -57,6 +57,35 @@ class ChatConsumer(AsyncWebsocketConsumer):
         
         user = self.scope["user"]
         
+        # --- Rate Limiting Logic ---
+        from django.core.cache import cache
+        import time
+        
+        # We allow 20 messages per 60 seconds
+        RATE_LIMIT = 20
+        WINDOW = 60
+        
+        cache_key = f'chat_ws_rate_limit_{user.id}'
+        # Get current message timestamps
+        timestamps = cache.get(cache_key, [])
+        now = time.time()
+        
+        # Filter timestamps to keep only those within the current window
+        timestamps = [ts for ts in timestamps if ts > now - WINDOW]
+        
+        if len(timestamps) >= RATE_LIMIT:
+            # Reject message and notify the client
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'message': f'Rate limit exceeded. Please wait before sending more messages.'
+            }))
+            return
+            
+        # Add current timestamp and save back to cache
+        timestamps.append(now)
+        cache.set(cache_key, timestamps, WINDOW)
+        # --- End Rate Limiting Logic ---
+        
         msg = await self.save_message(user, message_content, file_ids)
         
         await self.channel_layer.group_send(

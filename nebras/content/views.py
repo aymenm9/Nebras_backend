@@ -5,19 +5,22 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Metadata, YoutubeVideo, R2File, MultipartUpload, Part
 from .serializers import MetadataSerializer, YoutubeVideoSerializer, R2FileSerializer,PartSerializer, MultipartUploadSerializer, MultipartUploadResponseSerializer, SimpleUploadResponseSerializer
-from .utils import generate_presigned_url, complete_r2_file, get_next_part_number, generate_presigned_url_for_part
+from .utils import generate_presigned_url, complete_r2_file, get_next_part_number, generate_presigned_url_for_part, abort_s3_multipart_upload, delete_s3_object
 from rest_framework.permissions import IsAuthenticated
 from users.permissions import IsModerator
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from drf_spectacular.utils import extend_schema, PolymorphicProxySerializer
+from rest_framework.throttling import ScopedRateThrottle
 # Create your views here.
 
 class UploadYoutubeVideo(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated,IsModerator]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'uploads'
     serializer_class = YoutubeVideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
+    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type','metadata__is_listed']
     search_fields = ['metadata__title','metadata__description']
     queryset = YoutubeVideo.objects.all()
 
@@ -32,12 +35,17 @@ class UploadYoutubeVideoDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return YoutubeVideo.objects.filter(metadata__created_by=self.request.user)
 
+    def perform_destroy(self, instance):
+        instance.metadata.delete()
+
 
 class R2FileUpload(generics.ListCreateAPIView):
     serializer_class = R2FileSerializer
     permission_classes = [IsAuthenticated,IsModerator]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'uploads'
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type', 'upload_type']
+    filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type', 'upload_type','metadata__is_listed']
     search_fields = ['metadata__title','metadata__description']
     queryset = R2File.objects.all()
 
@@ -51,6 +59,17 @@ class R2FileUploadDetail(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return R2File.objects.filter(metadata__created_by=self.request.user)
+
+    def perform_destroy(self, instance):
+        if instance.upload_type == 'multipart':
+            if instance.upload_status != 'completed' and hasattr(instance, 'multipart_uploader') and instance.multipart_uploader.upload_id:
+                abort_s3_multipart_upload(instance.file_key, instance.multipart_uploader.upload_id)
+            else:
+                delete_s3_object(instance.file_key)
+        else:
+            delete_s3_object(instance.file_key)
+        
+        instance.metadata.delete()
 
 
 class MultipartUploadDetail(generics.RetrieveAPIView):
@@ -113,6 +132,17 @@ class PartDetail(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return Part.objects.filter(multipart_upload__r2_file__metadata__created_by=self.request.user)
+
+    def perform_destroy(self, instance):
+        # We don't abort the entire multipart upload just because one part gets deleted.
+        # R2 will automatically clean up incomplete parts after a lifecycle policy completes (usually).
+        # We just remove the part record and decrement the uploaded part counter safely or leave it to be recreated.
+        multipart_upload = instance.multipart_upload
+        super().perform_destroy(instance)
+        # Fix counter if we delete a part
+        if multipart_upload.uploaded_parts > 0:
+            multipart_upload.uploaded_parts -= 1
+            multipart_upload.save()
 
 class CompleteMultipartUpload(views.APIView): 
     permission_classes = [IsAuthenticated,IsModerator]

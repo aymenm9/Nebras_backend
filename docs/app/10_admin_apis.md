@@ -8,6 +8,7 @@ This module handles administrative tasks and superuser-specific functionalities.
 - **Section Management**: CRUD operations for Sections, Sub-Sections, and Secondary Sub-Sections.
 - **Content Management**: CRUD operations for Content (YouTube, R2 Files).
 - **Chat Management**: CRUD operations for strict moderation of Chat Messages and Files.
+- **Statistics Management**: Aggregation views yielding totals, distributions, and time-series for platform oversight.
 
 ## Security
 - **Authentication**: JWT Authentication (IsAuthenticated).

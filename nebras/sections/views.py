@@ -15,7 +15,7 @@ class MainSectionListCreateView(generics.ListCreateAPIView):
     serializer_class = MainSectionSerializer
     permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by']
+    filterset_fields = ['created_by','is_listed']
     search_fields = ['name']
 
     def get_queryset(self):
@@ -40,7 +40,7 @@ class SubSectionListCreateView(generics.ListCreateAPIView):
     serializer_class = SubSectionSerializer
     permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by','main_section']
+    filterset_fields = ['created_by','main_section','is_listed']
     search_fields = ['name']
 
     def get_queryset(self):
@@ -66,7 +66,7 @@ class SecondarySubSectionListCreateView(generics.ListCreateAPIView):
     serializer_class = SecondarySubSectionSerializer
     permission_classes = [IsAuthenticated,IsModerator]
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['created_by','sub_section','sub_section__main_section']
+    filterset_fields = ['created_by','sub_section','sub_section__main_section','is_listed']
     search_fields = ['name']
 
     def get_queryset(self):

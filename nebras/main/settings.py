@@ -19,18 +19,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
+from decouple import config, Csv
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8d3xm03pyt2i(2xugcgup#q8#0ytl7f75ppieglm^@j!9nw-(7'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
-CORS_ALLOW_CREDENTIALS = True  # This is the missing piece
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://localhost:5174",
-]
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+CORS_ALLOW_CREDENTIALS = config('CORS_ALLOW_CREDENTIALS', default=True, cast=bool)
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://localhost:5174', cast=Csv())
+
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool) # for dev
+
 
 # Application definition
 
@@ -54,6 +56,7 @@ INSTALLED_APPS = [
     'users',
     'sections',
     'content',
+    'dashboard_statistics',
     'admin_apis',
     'public_apis',
     'chat',
@@ -98,12 +101,24 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+    }
+    }
 
 
 # Password validation
@@ -157,6 +172,18 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/min',
+        'user': '1000/min',
+        'login': '5/min',
+        'password_change': '3/min',
+        'uploads': '20/min',
+    }
 }
 
 SPECTACULAR_SETTINGS = {
@@ -167,9 +194,6 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
     
 }
-
-CORS_ALLOW_ALL_ORIGINS = True # for dev
-
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -180,34 +204,25 @@ SIMPLE_JWT = {
 }
 
 
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+DEFAULT_FILE_STORAGE = config('DEFAULT_FILE_STORAGE', default="storages.backends.s3boto3.S3Boto3Storage")
 
-AWS_STORAGE_BUCKET_NAME = "nebras"
-AWS_ACCESS_KEY_ID = "1923894159f5bf490c758bfbfba75066"
-AWS_SECRET_ACCESS_KEY = "cf3c14486841e5e00214e2a820180a8f2bb32bd5bc0adff2700e803eeb2def90"
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
 
-AWS_S3_ENDPOINT_URL="https://6bb0001629192457dd8ede364681f27e.r2.cloudflarestorage.com"
-AWS_S3_REGION_NAME = "auto"
-AWS_REGION = "auto"
-
-
+AWS_S3_ENDPOINT_URL=config('AWS_S3_ENDPOINT_URL')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME')
+AWS_REGION = config('AWS_REGION', default="auto")
 
 
-AWS_S3_SIGNATURE_VERSION = "s3v4"
-AWS_S3_ADDRESSING_STYLE = "virtual"
-AWS_DEFAULT_ACL = None
-AWS_QUERYSTRING_AUTH = True  # Generate signed URLs for private files
-AWS_QUERYSTRING_EXPIRE = 3600  # URLs expire after 1 hour (in seconds)
 
-import redis
 
-r = redis.Redis(
-    host='redis-10148.crce202.eu-west-3-1.ec2.cloud.redislabs.com',
-    port=10148,
-    decode_responses=True,
-    username="default",
-    password="7kEuOCkHvehbkIISUvTVZClzgM58zHsl",
-)
+AWS_S3_SIGNATURE_VERSION = config('AWS_S3_SIGNATURE_VERSION', default="s3v4")
+AWS_S3_ADDRESSING_STYLE = config('AWS_S3_ADDRESSING_STYLE', default="virtual")
+AWS_DEFAULT_ACL = config('AWS_DEFAULT_ACL', default=None)
+AWS_QUERYSTRING_AUTH = config('AWS_QUERYSTRING_AUTH', default=True, cast=bool)  # Generate signed URLs for private files
+AWS_QUERYSTRING_EXPIRE = config('AWS_QUERYSTRING_EXPIRE', default=3600, cast=int)  # URLs expire after 1 hour (in seconds)
+
 
 
 # ASGI Configuration
@@ -219,7 +234,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [
-                "redis://default:7kEuOCkHvehbkIISUvTVZClzgM58zHsl@redis-10148.crce202.eu-west-3-1.ec2.cloud.redislabs.com:10148"
+                config('REDIS_URL'),
             ],
         },
     },
@@ -227,8 +242,8 @@ CHANNEL_LAYERS = {
 
 
 # multipart upload settings
-PART_SIZE = 10 * 1024 * 1024 # 10MB
+PART_SIZE = config('PART_SIZE', default=10 * 1024 * 1024, cast=int) # 10MB
 
-MULTIPART_THRESHOLD = 50 * 1024 * 1024 # 50MB
+MULTIPART_THRESHOLD = config('MULTIPART_THRESHOLD', default=50 * 1024 * 1024, cast=int) # 50MB
 
 

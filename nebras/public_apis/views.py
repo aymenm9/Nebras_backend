@@ -10,7 +10,7 @@ class PublicMainSectionListView(generics.ListAPIView):
     """
     Public list of Main Sections (No Auth).
     """
-    queryset = MainSection.objects.all()
+    queryset = MainSection.objects.all().filter(is_listed=True)
     serializer_class = MainSectionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by']
@@ -21,15 +21,15 @@ class PublicMainSectionRetrieveView(generics.RetrieveAPIView):
     """
     Public retrieve of Main Section (No Auth).
     """
-    queryset = MainSection.objects.all()
-    serializer_class = MainSectionSerializer
+    queryset = MainSection.objects.all().filter(is_listed=True)
+    serializer_class = MainSectionSerializer    
 
 
 class PublicSubSectionListView(generics.ListAPIView):
     """
     Public list of Sub Sections (No Auth).
     """
-    queryset = SubSection.objects.all()
+    queryset = SubSection.objects.all().filter(is_listed=True)
     serializer_class = SubSectionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','main_section']
@@ -40,7 +40,7 @@ class PublicSubSectionRetrieveView(generics.RetrieveAPIView):
     """
     Public retrieve of Sub Section (No Auth).
     """
-    queryset = SubSection.objects.all()
+    queryset = SubSection.objects.all().filter(is_listed=True)
     serializer_class = SubSectionSerializer
 
 
@@ -48,7 +48,7 @@ class PublicSecondarySubSectionListView(generics.ListAPIView):
     """
     Public list of Secondary Sub Sections (No Auth).
     """
-    queryset = SecondarySubSection.objects.all()
+    queryset = SecondarySubSection.objects.all().filter(is_listed=True)
     serializer_class = SecondarySubSectionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','sub_section','sub_section__main_section']
@@ -58,7 +58,7 @@ class PublicSecondarySubSectionRetrieveView(generics.RetrieveAPIView):
     """
     Public retrieve of Secondary Sub Section (No Auth).
     """
-    queryset = SecondarySubSection.objects.all()
+    queryset = SecondarySubSection.objects.all().filter(is_listed=True)
     serializer_class = SecondarySubSectionSerializer
 
 
@@ -67,30 +67,30 @@ class PublishYoutubeVideo(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
     search_fields = ['metadata__title','metadata__description']
-    queryset = YoutubeVideo.objects.all()
+    queryset = YoutubeVideo.objects.all().filter(metadata__is_listed=True)
 
 class PublishYoutubeVideoDetail(generics.RetrieveAPIView):
     serializer_class = YoutubeVideoSerializer
-    queryset = YoutubeVideo.objects.all()
+    queryset = YoutubeVideo.objects.all().filter(metadata__is_listed=True)
 
 class PublishMetadata(generics.ListAPIView):
     serializer_class = MetadataSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','subsection','subsection__main_section','secondary_subsection','content_type']
     search_fields = ['title','description']
-    queryset = Metadata.objects.all()
+    queryset = Metadata.objects.all().filter(is_listed=True)
 
 class PublishMetadataDetail(generics.RetrieveAPIView):
     serializer_class = MetadataSerializer
-    queryset = Metadata.objects.all()
+    queryset = Metadata.objects.all().filter(is_listed=True)
 
 class PublishR2File(generics.ListAPIView):
     serializer_class = R2FileSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
     search_fields = ['metadata__title','metadata__description']
-    queryset = R2File.objects.all().filter(upload_status='completed')
+    queryset = R2File.objects.all().filter(upload_status='completed', metadata__is_listed=True)
 
 class PublishR2FileDetail(generics.RetrieveAPIView):
     serializer_class = R2FileSerializer
-    queryset = R2File.objects.all().filter(upload_status='completed')
+    queryset = R2File.objects.all().filter(upload_status='completed', metadata__is_listed=True)

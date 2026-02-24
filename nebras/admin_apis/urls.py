@@ -32,4 +32,13 @@ urlpatterns = [
     path('chat/messages/<int:pk>/', views.AdminChatMessageRetrieveUpdateDestroyView.as_view(), name='admin-chat-message-detail'),
     path('chat/files/', views.AdminMessageFileListView.as_view(), name='admin-chat-file-list'),
     path('chat/files/<int:pk>/', views.AdminMessageFileRetrieveUpdateDestroyView.as_view(), name='admin-chat-file-detail'),
+
+
+    # Statistics Management
+    path('statistics/totals/', views.AdminTotalsView.as_view(), name='admin-statistics-totals'),
+    path('statistics/content-distribution/', views.AdminContentDistributionView.as_view(), name='admin-statistics-content-distribution'),
+    path('statistics/top-sections/', views.AdminTopSectionsView.as_view(), name='admin-statistics-top-sections'),
+    path('statistics/registrations-chart/', views.AdminRegistrationsChartView.as_view(), name='admin-statistics-registrations-chart'),
+    path('statistics/content-added-chart/', views.AdminContentAddedChartView.as_view(), name='admin-statistics-content-added-chart'),
 ]
+

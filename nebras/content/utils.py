@@ -106,6 +106,27 @@ def complete_multipart_upload(multipart_upload: MultipartUpload):
         UploadId=multipart_upload.upload_id
     )
 
+def abort_s3_multipart_upload(file_key: str, upload_id: str):
+    s3 = get_s3_client()
+    try:
+        s3.abort_multipart_upload(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=file_key,
+            UploadId=upload_id
+        )
+    except Exception as e:
+        print(f"Error aborting multipart upload: {e}")
+
+def delete_s3_object(file_key: str):
+    s3 = get_s3_client()
+    try:
+        s3.delete_object(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=file_key
+        )
+    except Exception as e:
+        print(f"Error deleting object from S3: {e}")
+
 def clc_total_parts(file_size: int):
     return file_size // settings.PART_SIZE + 1
 
@@ -126,4 +147,3 @@ def complete_r2_file(r2_file: R2File):
     r2_file.upload_status = 'completed'
     r2_file.save()
     return True
-        

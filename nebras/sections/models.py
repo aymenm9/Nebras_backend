@@ -6,6 +6,7 @@ class MainSection(models.Model):
     name = models.CharField(max_length=255)
     order_index = models.PositiveIntegerField(default=0)
     thumbnail = models.ImageField(upload_to='public/section_thumbnails', storage=S3Boto3Storage(), blank=True, null=True)
+    is_listed = models.BooleanField(default=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -20,6 +21,7 @@ class SubSection(models.Model):
     name = models.CharField(max_length=255)
     order_index = models.PositiveIntegerField(default=0)
     thumbnail = models.ImageField(upload_to='public/sub_section_thumbnails', storage=S3Boto3Storage(), blank=True, null=True)
+    is_listed = models.BooleanField(default=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -35,6 +37,7 @@ class SecondarySubSection(models.Model):
     name = models.CharField(max_length=255)
     order_index = models.PositiveIntegerField(default=0)
     thumbnail = models.ImageField(upload_to='public/secondary_section_thumbnails', storage=S3Boto3Storage(), blank=True, null=True)
+    is_listed = models.BooleanField(default=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

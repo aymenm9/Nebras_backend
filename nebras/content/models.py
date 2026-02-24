@@ -22,6 +22,7 @@ class Metadata(models.Model):
     )
     subsection = models.ForeignKey(SubSection, on_delete=models.CASCADE)
     secondary_subsection = models.ForeignKey(SecondarySubSection, on_delete=models.CASCADE, null=True, blank=True)
+    is_listed = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
