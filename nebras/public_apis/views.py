@@ -4,7 +4,7 @@ from sections.serializers import MainSectionSerializer, SubSectionSerializer, Se
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from content.models import YoutubeVideo, Metadata, R2File
-from content.serializers import YoutubeVideoSerializer, MetadataSerializer, R2FileSerializer
+from content.serializers import YoutubeVideoSerializer, MetadataSerializer, R2FileSerializer, AllContentSerializer
 
 class PublicMainSectionListView(generics.ListAPIView):
     """
@@ -94,3 +94,11 @@ class PublishR2File(generics.ListAPIView):
 class PublishR2FileDetail(generics.RetrieveAPIView):
     serializer_class = R2FileSerializer
     queryset = R2File.objects.all().filter(upload_status='completed', metadata__is_listed=True)
+
+
+class PublishAllContent(generics.ListAPIView):
+    serializer_class = AllContentSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['created_by','subsection','subsection__main_section','secondary_subsection','content_type']
+    search_fields = ['title','description']
+    queryset = Metadata.objects.all().filter(is_listed=True)

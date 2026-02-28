@@ -127,8 +127,10 @@ def delete_s3_object(file_key: str):
     except Exception as e:
         print(f"Error deleting object from S3: {e}")
 
+import math
+
 def clc_total_parts(file_size: int):
-    return file_size // settings.PART_SIZE + 1
+    return math.ceil(file_size / settings.PART_SIZE)
 
 
 def get_next_part_number(multipart_upload: MultipartUpload):

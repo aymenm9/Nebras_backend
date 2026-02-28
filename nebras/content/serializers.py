@@ -48,7 +48,11 @@ class R2FileSerializer(serializers.ModelSerializer):
         read_only_fields = ['file_url', 'file_key', 'created_at', 'updated_at', 'id', 'upload_status', 'upload_type', 'multipart_uploader']
 
     def get_file_url(self, obj):
-        return generate_presigned_url(obj, method='get_object') if obj.upload_status == 'completed' else None
+        if obj.upload_status == 'completed':
+            if getattr(settings, 'R2_PUBLIC_DOMAIN', None):
+                return f"{settings.R2_PUBLIC_DOMAIN.rstrip('/')}/{obj.file_key}"
+            return generate_presigned_url(obj, method='get_object')
+        return None
         
     def create(self, validated_data):
         thumbnail = validated_data.pop('thumbnail', None)
@@ -101,7 +105,7 @@ class PartSerializer(serializers.ModelSerializer):
         if Part.objects.filter(multipart_upload=validated_data['multipart_upload'], part_number=validated_data['part_number']).exists():
             part = Part.objects.get(multipart_upload=validated_data['multipart_upload'], part_number=validated_data['part_number'])
             part.etag = validated_data['etag']
-            part.completed = validated_data['completed']
+            part.completed = validated_data.get('completed', True)
             part.save()
             return part
         multipart_upload = validated_data.pop('multipart_upload')
@@ -125,3 +129,14 @@ class MultipartUploadResponseSerializer(serializers.Serializer):
 
 class SimpleUploadResponseSerializer(serializers.Serializer):
     presigned_url = serializers.URLField()
+
+
+class AllContentSerializer(serializers.ModelSerializer):
+    youtube_video = YoutubeVideoSerializer(required=False, allow_null=True)
+    r2_file = R2FileSerializer(required=False, allow_null=True)
+    class Meta:
+        model = Metadata
+        fields = ['id', 'title', 'description', 'content_type', 'subsection', 'secondary_subsection', 'created_by', 'created_at', 'updated_at', 'youtube_video', 'r2_file']
+        read_only_fields = ['created_at', 'updated_at', 'id']
+
+    

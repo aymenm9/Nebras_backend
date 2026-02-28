@@ -60,17 +60,6 @@ class R2FileUploadDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return R2File.objects.filter(metadata__created_by=self.request.user)
 
-    def perform_destroy(self, instance):
-        if instance.upload_type == 'multipart':
-            if instance.upload_status != 'completed' and hasattr(instance, 'multipart_uploader') and instance.multipart_uploader.upload_id:
-                abort_s3_multipart_upload(instance.file_key, instance.multipart_uploader.upload_id)
-            else:
-                delete_s3_object(instance.file_key)
-        else:
-            delete_s3_object(instance.file_key)
-        
-        instance.metadata.delete()
-
 
 class MultipartUploadDetail(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated,IsModerator]
@@ -113,7 +102,16 @@ class GetUploadURL(views.APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         
         if r2_file.upload_type == 'multipart':
-            next_part_number = get_next_part_number(r2_file.multipart_uploader)
+            # Allow frontend to specify part number for parallel uploads
+            requested_part = request.data.get('part_number')
+            if requested_part:
+                try:
+                    next_part_number = int(requested_part)
+                except ValueError:
+                    return Response({'error': 'Invalid part_number'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                next_part_number = get_next_part_number(r2_file.multipart_uploader)
+                
             presigned_url = generate_presigned_url_for_part(r2_file,part_number=next_part_number)
             return Response({'presigned_url': presigned_url, 'next_part_number': next_part_number}, status=status.HTTP_200_OK)
         else:

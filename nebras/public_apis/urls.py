@@ -5,7 +5,8 @@ from .views import (
     PublicSecondarySubSectionListView, PublicSecondarySubSectionRetrieveView,
     PublishYoutubeVideo, PublishYoutubeVideoDetail,
     PublishMetadata, PublishMetadataDetail,
-    PublishR2File, PublishR2FileDetail
+    PublishR2File, PublishR2FileDetail,
+    PublishAllContent
 )
 
 urlpatterns = [
@@ -24,4 +25,7 @@ urlpatterns = [
     path('metadata/<int:pk>/', PublishMetadataDetail.as_view(), name='public-metadata-detail'),
     path('files/', PublishR2File.as_view(), name='public-r2file-list'),
     path('files/<int:pk>/', PublishR2FileDetail.as_view(), name='public-r2file-detail'),
+
+    # All content endpoints
+    path('all/', PublishAllContent.as_view(), name='public-all-content'),
 ]
