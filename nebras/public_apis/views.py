@@ -66,7 +66,7 @@ class PublishYoutubeVideo(generics.ListAPIView):
     serializer_class = YoutubeVideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
-    search_fields = ['metadata__title','metadata__description']
+    search_fields = ['metadata__title','metadata__description','metadata__author']
     queryset = YoutubeVideo.objects.all().filter(metadata__is_listed=True)
 
 class PublishYoutubeVideoDetail(generics.RetrieveAPIView):
@@ -77,7 +77,7 @@ class PublishMetadata(generics.ListAPIView):
     serializer_class = MetadataSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','subsection','subsection__main_section','secondary_subsection','content_type']
-    search_fields = ['title','description']
+    search_fields = ['title','description','author']
     queryset = Metadata.objects.all().filter(is_listed=True)
 
 class PublishMetadataDetail(generics.RetrieveAPIView):
@@ -88,7 +88,7 @@ class PublishR2File(generics.ListAPIView):
     serializer_class = R2FileSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type']
-    search_fields = ['metadata__title','metadata__description']
+    search_fields = ['metadata__title','metadata__description','metadata__author']
     queryset = R2File.objects.all().filter(upload_status='completed', metadata__is_listed=True)
 
 class PublishR2FileDetail(generics.RetrieveAPIView):
@@ -100,5 +100,5 @@ class PublishAllContent(generics.ListAPIView):
     serializer_class = AllContentSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['created_by','subsection','subsection__main_section','secondary_subsection','content_type']
-    search_fields = ['title','description']
+    search_fields = ['title','description','author']
     queryset = Metadata.objects.all().filter(is_listed=True)

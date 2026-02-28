@@ -85,7 +85,7 @@ class AdminYoutubeVideoListView(generics.ListAPIView):
     serializer_class = YoutubeVideoSerializer
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     filterset_fields = ['metadata__created_by', 'metadata__subsection', 'metadata__subsection__main_section', 'metadata__content_type','metadata__is_listed']
-    search_fields = ['metadata__title', 'metadata__description']
+    search_fields = ['metadata__title', 'metadata__description','metadata__author']
 
 class AdminYoutubeVideoRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = YoutubeVideo.objects.all()
@@ -97,7 +97,7 @@ class AdminR2FileListView(generics.ListAPIView):
     serializer_class = R2FileSerializer
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     filterset_fields = ['metadata__created_by', 'metadata__subsection', 'metadata__subsection__main_section', 'metadata__content_type','metadata__is_listed']
-    search_fields = ['metadata__title', 'metadata__description']
+    search_fields = ['metadata__title', 'metadata__description','metadata__author']
 
 class AdminR2FileRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = R2File.objects.all()

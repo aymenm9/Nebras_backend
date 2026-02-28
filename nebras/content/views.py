@@ -21,7 +21,7 @@ class UploadYoutubeVideo(generics.ListCreateAPIView):
     serializer_class = YoutubeVideoSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type','metadata__is_listed']
-    search_fields = ['metadata__title','metadata__description']
+    search_fields = ['metadata__title','metadata__description','metadata__author']
     queryset = YoutubeVideo.objects.all()
 
     def get_queryset(self):
@@ -46,7 +46,7 @@ class R2FileUpload(generics.ListCreateAPIView):
     throttle_scope = 'uploads'
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['metadata__created_by','metadata__subsection','metadata__subsection__main_section','metadata__secondary_subsection','metadata__content_type', 'upload_type','metadata__is_listed']
-    search_fields = ['metadata__title','metadata__description']
+    search_fields = ['metadata__title','metadata__description','metadata__author']
     queryset = R2File.objects.all()
 
     def get_queryset(self):
