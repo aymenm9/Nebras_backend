@@ -20,7 +20,7 @@ class Metadata(models.Model):
         null=True, 
         blank=True
     )
-    author = models.CharField(max_length=100)
+    author = models.CharField(max_length=100, null=True, blank=True)
     subsection = models.ForeignKey(SubSection, on_delete=models.CASCADE)
     secondary_subsection = models.ForeignKey(SecondarySubSection, on_delete=models.CASCADE, null=True, blank=True)
     is_listed = models.BooleanField(default=True)

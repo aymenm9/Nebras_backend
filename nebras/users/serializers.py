@@ -58,7 +58,7 @@ class ModeratorSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
     def create(self, validated_data):
         profile_image = validated_data.pop('profile_image', None)
-        user = User.objects.create(**validated_data)
+        user = User.objects.create(**validated_data,is_staff=True)
         profile = Profile.objects.create(user=user, profile_image=profile_image)
         user.set_password(validated_data['password'])
         user.save()

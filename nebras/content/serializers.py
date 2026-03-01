@@ -6,7 +6,7 @@ class MetadataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metadata
         fields = '__all__'
-        read_only_fields = ['created_by', 'created_at', 'updated_at', 'id', 'author']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'id']
 
     
 class YoutubeVideoSerializer(serializers.ModelSerializer):
@@ -137,6 +137,5 @@ class AllContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metadata
         fields = ['id', 'title', 'description', 'content_type', 'subsection', 'secondary_subsection', 'created_by', 'created_at', 'updated_at', 'youtube_video', 'r2_file', 'author', 'thumbnail']
-        read_only_fields = ['created_at', 'updated_at', 'id', 'author', 'created_by', 'thumbnail', 'content_type', 'subsection', 'secondary_subsection', 'is_listed']
-
+        
     

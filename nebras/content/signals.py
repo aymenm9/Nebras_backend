@@ -26,3 +26,8 @@ def r2file_post_delete(sender, instance, **kwargs):
     # We use post_delete so we don't accidentally delete the metadata if the R2File deletion fails.
     if hasattr(instance, 'metadata') and instance.metadata:
         instance.metadata.delete()
+
+@receiver(pre_delete, sender=Metadata)
+def metadata_pre_delete(sender, instance, **kwargs):
+    if instance.thumbnail:
+        instance.thumbnail.delete(save=False)

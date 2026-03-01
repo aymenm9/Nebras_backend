@@ -17,4 +17,3 @@ class MessageFile(models.Model):
         upload_to='chat_files/', 
         storage=S3Boto3Storage()
     )
-    
