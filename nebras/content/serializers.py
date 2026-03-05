@@ -5,7 +5,7 @@ from django.conf import settings
 class MetadataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metadata
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'content_type', 'subsection', 'secondary_subsection', 'created_by', 'created_at', 'updated_at', 'author', 'thumbnail','r2_file', 'youtube_video']
         read_only_fields = ['created_by', 'created_at', 'updated_at', 'id']
 
     
@@ -47,7 +47,7 @@ class R2FileSerializer(serializers.ModelSerializer):
         fields = ['id', 'file_url', 'metadata', 'filename', 'file_size', 'file_type', 'upload_status', 'upload_type', 'multipart_uploader', 'thumbnail']
         read_only_fields = ['file_url', 'file_key', 'created_at', 'updated_at', 'id', 'upload_status', 'upload_type', 'multipart_uploader']
 
-    def get_file_url(self, obj):
+    def get_file_url(self, obj) -> str | None:
         if obj.upload_status == 'completed':
             if getattr(settings, 'R2_PUBLIC_DOMAIN', None):
                 return f"{settings.R2_PUBLIC_DOMAIN.rstrip('/')}/{obj.file_key}"
@@ -131,11 +131,30 @@ class SimpleUploadResponseSerializer(serializers.Serializer):
     presigned_url = serializers.URLField()
 
 
+class YoutubeVideoPubListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = YoutubeVideo
+        fields = ['id', 'video_url']
+
+class R2FilePubListSerializer(serializers.ModelSerializer):
+
+    file_url = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = R2File
+        fields = ['id', 'file_url','filename', 'file_size', 'file_type', 'upload_status']
+
+    def get_file_url(self, obj) -> str | None:
+        if obj.upload_status == 'completed':
+            if getattr(settings, 'R2_PUBLIC_DOMAIN', None):
+                return f"{settings.R2_PUBLIC_DOMAIN.rstrip('/')}/{obj.file_key}"
+            return generate_presigned_url(obj, method='get_object')
+        return None
+
 class AllContentSerializer(serializers.ModelSerializer):
-    youtube_video = YoutubeVideoSerializer(required=False, allow_null=True)
-    r2_file = R2FileSerializer(required=False, allow_null=True)
+    youtube_video = YoutubeVideoPubListSerializer(required=False, allow_null=True)
+    r2_file = R2FilePubListSerializer(required=False, allow_null=True)
     class Meta:
         model = Metadata
         fields = ['id', 'title', 'description', 'content_type', 'subsection', 'secondary_subsection', 'created_by', 'created_at', 'updated_at', 'youtube_video', 'r2_file', 'author', 'thumbnail']
-        
+                
     

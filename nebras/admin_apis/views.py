@@ -14,7 +14,19 @@ from content.serializers import YoutubeVideoSerializer, R2FileSerializer
 from chat.models import ChatMessage, MessageFile
 from chat.serializers import ChatMessageSerializer, MessageFileSerializer
 
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.db.models import Count, Q
+from django.db.models.functions import TruncDate
+from datetime import timedelta
+from django.utils import timezone
+from content.models import Metadata
+from dashboard_statistics.serializers import (
+    TotalsSerializer, ContentDistributionSerializer, 
+    TopSectionsSerializer, RegistrationsChartSerializer, 
+    ContentAddedChartSerializer
+)
+from drf_spectacular.utils import extend_schema
 # Moderator Management (Moderators are super admin only)
 class AdminModeratorListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.filter(is_staff=True, is_superuser=False)
@@ -130,22 +142,15 @@ class AdminMessageFileRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAP
 
 # Statistics Views
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db.models import Count, Q
-from django.db.models.functions import TruncDate
-from datetime import timedelta
-from django.utils import timezone
-from content.models import Metadata
-from dashboard_statistics.serializers import (
-    TotalsSerializer, ContentDistributionSerializer, 
-    TopSectionsSerializer, RegistrationsChartSerializer, 
-    ContentAddedChartSerializer
-)
+
 
 class AdminTotalsView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
+    @extend_schema(
+        description="Get the total counts of various entities in the system.",
+        responses=TotalsSerializer
+    )
     def get(self, request):
         total_moderators = User.objects.filter(is_staff=True, is_superuser=False).count()
         total_content_items = Metadata.objects.count()
@@ -170,6 +175,10 @@ class AdminTotalsView(APIView):
 class AdminContentDistributionView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
+    @extend_schema(
+        description="Get the distribution of content items by content type.",
+        responses=ContentDistributionSerializer
+    )
     def get(self, request):
         distribution = Metadata.objects.values('content_type').annotate(count=Count('id'))
         
@@ -184,6 +193,10 @@ class AdminContentDistributionView(APIView):
 class AdminTopSectionsView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
+    @extend_schema(
+        description="Get the top sections based on the number of content items.",
+        responses=TopSectionsSerializer(many=True)
+    )
     def get(self, request):
         # Annotate main_sections with the total count of their nested subsections metadata
         top_sections = MainSection.objects.annotate(
@@ -200,6 +213,10 @@ class AdminTopSectionsView(APIView):
 class AdminRegistrationsChartView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
+    @extend_schema(
+        description="Get the number of user registrations in the last 30 days, grouped by date.",
+        responses=RegistrationsChartSerializer(many=True)
+    )
     def get(self, request):
         
         registrations = User.objects.annotate(date=TruncDate('date_joined')) \
@@ -214,6 +231,10 @@ class AdminRegistrationsChartView(APIView):
 class AdminContentAddedChartView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
 
+    @extend_schema(
+        description="Get the number of content items added in the last 30 days, grouped by date and content type.",
+        responses=ContentAddedChartSerializer(many=True)
+    )
     def get(self, request):
         thirty_days_ago = timezone.now() - timedelta(days=30)
         

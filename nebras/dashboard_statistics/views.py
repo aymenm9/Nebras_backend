@@ -14,9 +14,15 @@ from .serializers import (
     ContentAddedChartSerializer
 )
 
+from drf_spectacular.utils import extend_schema
+
 class ModeratorTotalsView(APIView):
     permission_classes = [IsAuthenticated, IsModerator]
 
+    @extend_schema(
+        description="Get the total counts of various entities for the moderator.",
+        responses=TotalsSerializer
+    )
     def get(self, request):
         user = request.user
         total_content_items = Metadata.objects.filter(created_by=user).count()
@@ -38,6 +44,10 @@ class ModeratorTotalsView(APIView):
 class ModeratorContentDistributionView(APIView):
     permission_classes = [IsAuthenticated, IsModerator]
 
+    @extend_schema(
+        description="Get the distribution of content items by content type.",
+        responses=ContentDistributionSerializer
+    )
     def get(self, request):
         distribution = Metadata.objects.filter(created_by=request.user).values('content_type').annotate(count=Count('id'))
         
@@ -52,6 +62,10 @@ class ModeratorContentDistributionView(APIView):
 class ModeratorContentAddedChartView(APIView):
     permission_classes = [IsAuthenticated, IsModerator]
 
+    @extend_schema(
+        description="Get the number of content items added in the last 30 days, grouped by date and content type.",
+        responses=ContentAddedChartSerializer(many=True)
+    )
     def get(self, request):
         thirty_days_ago = timezone.now() - timedelta(days=30)
         

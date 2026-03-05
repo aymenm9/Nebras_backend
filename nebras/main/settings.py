@@ -28,10 +28,14 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 CORS_ALLOW_CREDENTIALS = config('CORS_ALLOW_CREDENTIALS', default=True, cast=bool)
+print("CORS_ALLOW_CREDENTIALS:", CORS_ALLOW_CREDENTIALS)
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://localhost:5174', cast=Csv())
+print("CORS_ALLOWED_ORIGINS:", CORS_ALLOWED_ORIGINS)
 
 CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool) # for dev
+print("CORS_ALLOW_ALL_ORIGINS:", CORS_ALLOW_ALL_ORIGINS)
 
 
 # Application definition
@@ -68,8 +72,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

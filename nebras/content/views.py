@@ -147,7 +147,7 @@ class CompleteMultipartUpload(views.APIView):
     
     @extend_schema(
         request=None,
-        responses={200: R2FileSerializer, 404: None, 403: None, 400: "Not all parts are completed in the multipart upload"},
+        responses={200: R2FileSerializer},
         description="Complete the multipart upload"
     )
     def post(self, request, pk:int):

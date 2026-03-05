@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from drf_spectacular.utils import extend_schema
-
+from rest_framework import serializers as drf_serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from rest_framework.throttling import ScopedRateThrottle
@@ -79,16 +79,18 @@ class PasswordChangeView(APIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'password_change'
 
-    class PasswordChangeSerializer(serializers.Serializer):
-        old_password = serializers.CharField()
-        new_password = serializers.CharField()
+
+
 
     @extend_schema(
         request=PasswordChangeSerializer,
-        responses={200: 'Password changed successfully'}
+        responses={
+            200: None,
+        },
+        description="Change the password of the current user. Requires old_password and new_password in the request body."
     )
     def post(self, request):
-        serializer = self.PasswordChangeSerializer(data=request.data)
+        serializer = PasswordChangeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         user = request.user
