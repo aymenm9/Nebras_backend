@@ -6,7 +6,8 @@ class MetadataSerializer(serializers.ModelSerializer):
     class Meta:
         model = Metadata
         fields = ['id', 'title', 'description', 'content_type', 'subsection', 'secondary_subsection', 'created_by', 'created_at', 'updated_at', 'author', 'thumbnail','r2_file', 'youtube_video']
-        read_only_fields = ['created_by', 'created_at', 'updated_at', 'id']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'id', 'r2_file', 'youtube_video']
+        
 
     
 class YoutubeVideoSerializer(serializers.ModelSerializer):

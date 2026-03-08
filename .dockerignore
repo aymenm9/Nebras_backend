@@ -1,0 +1,27 @@
+# Git
+.git/
+.gitignore
+
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Docs and meta files
+docs/
+README.md
+GEMINI.md
+
+# IDE/editor settings
+.vscode/
+.idea/
+.cursorignore
+.cursorindexingignore
+
+# Ruff / linters
+.ruff_cache/
