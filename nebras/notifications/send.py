@@ -4,15 +4,8 @@ from firebase_admin import messaging
 from firebase_admin.exceptions import FirebaseError
 
 
-def send_message(device: Device, title:str, body:str):
+def send_message(device: Device, message:messaging.Message):
     try:
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            token=device.token,
-        )
         messaging.send(message)
     except FirebaseError as e:
         device.is_active = False

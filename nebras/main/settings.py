@@ -28,15 +28,14 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=Csv())
-print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
+
 CORS_ALLOW_CREDENTIALS = config('CORS_ALLOW_CREDENTIALS', default=True, cast=bool)
-print("CORS_ALLOW_CREDENTIALS:", CORS_ALLOW_CREDENTIALS)
+
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:5173,http://localhost:5174', cast=Csv())
-print("CORS_ALLOWED_ORIGINS:", CORS_ALLOWED_ORIGINS)
 
 CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=True, cast=bool) # for dev
-print("CORS_ALLOW_ALL_ORIGINS:", CORS_ALLOW_ALL_ORIGINS)
 
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:5173,http://localhost:5174', cast=Csv())
 
 # Application definition
 
@@ -68,11 +67,13 @@ INSTALLED_APPS = [
     
     "channels",
     "channels_redis",
+    "django_huey",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'main.middleware.RequestLoggingMiddleware',  # Request Logger
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -208,6 +209,7 @@ SIMPLE_JWT = {
 }
 
 
+
 DEFAULT_FILE_STORAGE = config('DEFAULT_FILE_STORAGE', default="storages.backends.s3boto3.S3Boto3Storage")
 
 AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
@@ -245,10 +247,73 @@ CHANNEL_LAYERS = {
     },
 }
 
+DJANGO_HUEY = {
+    'default': 'nebras',
+    'queues': {
+        'nebras': {
+            'name': 'nebras',   # queue name
+            'url': config('REDIS_URL', default='redis://127.0.0.1:6379'),
+            'immediate': False,
+            'connection': {
+                'read_timeout': 1,
+                'url': config('REDIS_URL', default='redis://127.0.0.1:6379'),
+            },
+            'consumer': {
+                'workers': 4,
+                'worker_type': 'thread',
+            },
+        }
+    }
+}
+
 
 # multipart upload settings
 PART_SIZE = config('PART_SIZE', default=10 * 1024 * 1024, cast=int) # 10MB
 
 MULTIPART_THRESHOLD = config('MULTIPART_THRESHOLD', default=50 * 1024 * 1024, cast=int) # 50MB
+
+
+# ==========================================
+# LOGGING CONFIGURATION
+# ==========================================
+import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG' if DEBUG else 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {  # Root logger - catches app-level loggers
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'request_logger': {  # Logger used in our Middleware
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
 
 
