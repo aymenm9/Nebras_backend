@@ -1,0 +1,15 @@
+services:
+  db:
+    container_name: nebras-db
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=nebrasDB
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=04200420
+    restart: unless-stopped
+    ports:
+      # Explicitly bind to IPv4 localhost to match Django's 127.0.0.1 connection attempt
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # Retains your existing local bind mount
+      - ./data/db:/var/lib/postgresql/data

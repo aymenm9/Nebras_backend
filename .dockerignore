@@ -25,3 +25,6 @@ GEMINI.md
 
 # Ruff / linters
 .ruff_cache/
+
+# Docker Data
+data/
