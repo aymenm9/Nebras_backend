@@ -20,7 +20,7 @@ class Metadata(models.Model):
         null=True, 
         blank=True
     )
-    author = models.CharField(max_length=100, null=True, blank=True)
+    author = models.CharField(max_length=255, null=True, blank=True)
     subsection = models.ForeignKey(SubSection, on_delete=models.CASCADE)
     secondary_subsection = models.ForeignKey(SecondarySubSection, on_delete=models.CASCADE, null=True, blank=True)
     is_listed = models.BooleanField(default=True)
@@ -55,7 +55,7 @@ class R2File(models.Model):
 
 class MultipartUpload(models.Model):
     r2_file = models.OneToOneField(R2File, on_delete=models.CASCADE, related_name='multipart_uploader')
-    upload_id = models.CharField(max_length=100, null=True, blank=True) # upload id for multipart upload
+    upload_id = models.CharField(max_length=512, null=True, blank=True) # upload id for multipart upload
     completed = models.BooleanField(default=False)
     total_parts = models.IntegerField()
     uploaded_parts = models.IntegerField(default=0)
@@ -68,7 +68,7 @@ class MultipartUpload(models.Model):
 class Part(models.Model):
     multipart_upload = models.ForeignKey(MultipartUpload, on_delete=models.CASCADE, related_name='parts')
     part_number = models.IntegerField()
-    etag = models.CharField(max_length=100, null=True, blank=True)
+    etag = models.CharField(max_length=512, null=True, blank=True)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
