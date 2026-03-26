@@ -28,6 +28,32 @@ class YoutubeVideoSerializer(serializers.ModelSerializer):
         youtube_video = YoutubeVideo.objects.create(metadata=metadata_instance, **validated_data)
         return youtube_video
 
+    def update(self, instance, validated_data):
+        metadata_data = validated_data.pop('metadata', None)
+        thumbnail = validated_data.pop('thumbnail', None)
+
+        metadata_instance = instance.metadata
+        metadata_updated = False
+
+        if thumbnail is not None:
+            metadata_instance.thumbnail = thumbnail
+            metadata_updated = True
+
+        if metadata_data is not None:
+            metadata_data.pop('thumbnail', None)
+            for attr, value in metadata_data.items():
+                setattr(metadata_instance, attr, value)
+            metadata_updated = True
+
+        if metadata_updated:
+            metadata_instance.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
+
 
 class MultipartUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -91,6 +117,32 @@ class R2FileSerializer(serializers.ModelSerializer):
             validated_data['upload_type'] = 'single'
             r2_file = R2File.objects.create(metadata=metadata_instance, **validated_data)
         return r2_file
+
+    def update(self, instance, validated_data):
+        metadata_data = validated_data.pop('metadata', None)
+        thumbnail = validated_data.pop('thumbnail', None)
+
+        metadata_instance = instance.metadata
+        metadata_updated = False
+
+        if thumbnail is not None:
+            metadata_instance.thumbnail = thumbnail
+            metadata_updated = True
+
+        if metadata_data is not None:
+            metadata_data.pop('thumbnail', None)
+            for attr, value in metadata_data.items():
+                setattr(metadata_instance, attr, value)
+            metadata_updated = True
+
+        if metadata_updated:
+            metadata_instance.save()
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
         
 
 
